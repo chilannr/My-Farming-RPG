@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 {
-    private int gameYear2 = 1; // 游戏年份
-    private int gameYear1 = 1; // 游戏年份
     private int gameYear = 1; // 游戏年份
     private Season gameSeason = Season.Spring; // 游戏季节
     private int gameDay = 1; // 游戏日期
