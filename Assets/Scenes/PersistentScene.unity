@@ -1098,7 +1098,7 @@ MonoBehaviour:
   fadeDuration: 1
   faderCanvasGroup: {fileID: 925917227}
   faderImage: {fileID: 925917228}
-  startingSceneName: 0
+  startingSceneName: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1157,7 +1157,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.34362757, g: 0.764151, b: 0.58650666, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -3947,7 +3947,7 @@ SortingGroup:
   m_Enabled: 1
   m_SortingLayerID: -1747907847
   m_SortingLayer: 6
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!61 &5849070000024557778
 BoxCollider2D:
