@@ -210,7 +210,7 @@ public enum ItemType
     none,               // 无类型
 
     [System.ComponentModel.Description("计数")]
-    Count               // 计数
+    count               // 计数
 }
 
 public static class EnumExtensions

@@ -127,7 +127,7 @@ public class GridCursor : MonoBehaviour
                 case ItemType.none:
                     break;
 
-                case ItemType.Count:
+                case ItemType.count:
                     break;
 
                 default:

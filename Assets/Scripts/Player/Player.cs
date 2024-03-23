@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : SingletonMonobehaviour<Player>
 {
     private AnimationOverrides animationOverrides;
-
+    private GridCursor gridCursor;
 
     // Movement Parameters
     private float xInput;
@@ -80,6 +80,10 @@ public class Player : SingletonMonobehaviour<Player>
         //获取主相机
         mainCamera = Camera.main;
     }
+    private void Start()
+    {
+        gridCursor = FindObjectOfType<GridCursor>();
+    }
     private void Update()
     {
         #region Player Input
@@ -89,6 +93,7 @@ public class Player : SingletonMonobehaviour<Player>
             PlayerMovementInput();
             PlayerWalkInput();
             PlayerTestInput();
+            PlayerClickInput();
 
             // Send event to any listeners for player movement input
             EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect,
@@ -193,6 +198,94 @@ public class Player : SingletonMonobehaviour<Player>
             movementSpeed = Settings.runningSpeed;
         }
     }
+    private void PlayerClickInput()
+    {
+        if (true)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                if (gridCursor.CursorIsEnabled )
+                {
+                    // Get Cursor Grid Position
+                    Vector3Int cursorGridPosition = gridCursor.GetGridPositionForCursor();
+
+                    // Get Player Grid Position
+                    Vector3Int playerGridPosition = gridCursor.GetGridPositionForPlayer();
+
+                    ProcessPlayerClickInput(cursorGridPosition, playerGridPosition);
+                }
+            }
+        }
+    }
+    private void ProcessPlayerClickInput(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
+    {
+        ResetMovement();
+
+        Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
+
+        // Get Grid property details at cursor position (the GridCursor validation routine ensures that grid property details are not null)
+        GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
+
+        // Get Selected item details
+        ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
+
+        if (itemDetails != null)
+        {
+            switch (itemDetails.itemType)
+            {
+                case ItemType.Seed:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
+                    }
+                    break;
+
+                case ItemType.Commodity:
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        ProcessPlayerClickInputCommodity(itemDetails);
+                    }
+                    break;
+
+                case ItemType.Watering_tool:
+                case ItemType.Breaking_tool:
+                case ItemType.Chopping_tool:
+                case ItemType.Hoeing_tool:
+                case ItemType.Reaping_tool:
+                case ItemType.Collecting_tool:
+                    //ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
+                    break;
+
+                case ItemType.none:
+                    break;
+
+                case ItemType.count:
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+    private void ProcessPlayerClickInputSeed(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+    {
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.seedItemCode == -1)
+        {
+            //PlantSeedAtCursor(gridPropertyDetails, itemDetails);
+        }
+        else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        {
+            EventHandler.CallDropSelectedItemEvent();
+        }
+    }
+    private void ProcessPlayerClickInputCommodity(ItemDetails itemDetails)
+    {
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        {
+            EventHandler.CallDropSelectedItemEvent();
+        }
+    }
+
 
     // TODO: Remove
     /// <summary>
