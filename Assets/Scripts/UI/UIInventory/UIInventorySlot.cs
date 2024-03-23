@@ -127,20 +127,25 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 // 获取鼠标位置的世界坐标
                 Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
-                // 在鼠标位置创建物品的预制体
-                //GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
-
-                GameObject itemGameObject = Instantiate(itemPrefab, worldPosition, Quaternion.identity, parentItem);
-                Item item = itemGameObject.GetComponent<Item>();
-                item.ItemCode = itemDetails.itemCode;
-
-                // 从玩家的物品清单中移除物品
-                InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
-
-                // 如果物品清单中没有该物品了，则取消选中
-                if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
+                Vector3Int gridPosition =GridPropertiesManager.Instance.grid.WorldToCell(worldPosition);
+                GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
+                if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
                 {
-                    ClearSelectedItem();
+                    // 在鼠标位置创建物品的预制体
+                    GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
+
+                    //GameObject itemGameObject = Instantiate(itemPrefab, worldPosition, Quaternion.identity, parentItem);
+                    Item item = itemGameObject.GetComponent<Item>();
+                    item.ItemCode = itemDetails.itemCode;
+
+                    // 从玩家的物品清单中移除物品
+                    InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
+
+                    // 如果物品清单中没有该物品了，则取消选中
+                    if (InventoryManager.Instance.FindItemInInventory(InventoryLocation.player, item.ItemCode) == -1)
+                    {
+                        ClearSelectedItem();
+                    }
                 }
             }
         }

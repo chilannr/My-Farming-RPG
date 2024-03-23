@@ -67,10 +67,19 @@ public enum PartVariantType
 }
 public enum GridBoolProperty
 {
+    // 表示网格是否可挖掘
     diggable,
+
+    // 表示网格是否可以放置物品
     canDropItem,
+
+    // 表示网格是否可以放置家具
     canPlaceFurniture,
+
+    // 表示网格是否是路径
     isPath,
+
+    // 表示网格是否是NPC的障碍物
     isNPCObstacle
 }
 

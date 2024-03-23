@@ -485,6 +485,69 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8036661073863828008, guid: fc8fc24e920219d4b8c0dda8904d3428, type: 3}
   m_PrefabInstance: {fileID: 77118820}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &291603018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 291603021}
+  - component: {fileID: 291603020}
+  - component: {fileID: 291603019}
+  m_Layer: 0
+  m_Name: GridPropertiesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &291603019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291603018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66988896525b5ca46910811948559abf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 0}
+  so_gridPropertiesArray:
+  - {fileID: 11400000, guid: d278b20edb7648e45becd503a2d3db8a, type: 2}
+  - {fileID: 11400000, guid: 84ab07bfccf3ce34ca98fc0ca18e2499, type: 2}
+  - {fileID: 11400000, guid: f5deb638fbe080e4383c3c196f0a5147, type: 2}
+--- !u!114 &291603020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291603018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1e757e4a18d404f89f1ad701cdb2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gUID: 1f240c19-61a2-4345-899b-fde1b8fc3ba5
+--- !u!4 &291603021
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291603018}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &313246318
 GameObject:
   m_ObjectHideFlags: 0
@@ -1098,7 +1161,7 @@ MonoBehaviour:
   fadeDuration: 1
   faderCanvasGroup: {fileID: 925917227}
   faderImage: {fileID: 925917228}
-  startingSceneName: 2
+  startingSceneName: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4397,3 +4460,4 @@ SceneRoots:
   - {fileID: 507381085}
   - {fileID: 1367958571}
   - {fileID: 1874852900}
+  - {fileID: 291603021}

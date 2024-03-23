@@ -11,6 +11,9 @@ public static class Settings
     public const float fadeOutSeconds = 0.35f; // 渐出时间
     public const float targetAlpha = 0.45f; // 目标透明度
 
+    //Tilemap
+    public const float gridCellSize = 1f; // 瓦片地图块大小
+
     // Player Movement
     public const float runningSpeed = 5.333f; // 跑步速度
     public const float walkingSpeed = 2.666f; // 行走速度
