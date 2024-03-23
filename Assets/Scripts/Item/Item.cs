@@ -26,7 +26,7 @@ public class Item : MonoBehaviour
         }
     }
 
-    private void Init(int itemCodeParam)
+    public void Init(int itemCodeParam)
     {
         if (itemCodeParam != 0) // 如果传入的物品代码不为0
         {

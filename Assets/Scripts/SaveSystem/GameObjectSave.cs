@@ -5,7 +5,7 @@ public class GameObjectSave
 {
     // string key = scene name
     public Dictionary<string, SceneSave> sceneData;
-
+    
     public GameObjectSave()
     {
         sceneData = new Dictionary<string, SceneSave>();

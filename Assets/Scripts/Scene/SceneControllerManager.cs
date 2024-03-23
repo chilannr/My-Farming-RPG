@@ -51,7 +51,7 @@ public class SceneControllerManager : SingletonMonobehaviour<SceneControllerMana
         yield return StartCoroutine(Fade(1f));
 
         // 存储场景数据
-       // SaveLoadManager.Instance.StoreCurrentSceneData();
+        SaveLoadManager.Instance.StoreCurrentSceneData();
 
         // 设置玩家位置
         Player.Instance.gameObject.transform.position = spawnPosition;
@@ -69,7 +69,7 @@ public class SceneControllerManager : SingletonMonobehaviour<SceneControllerMana
         EventHandler.CallAfterSceneLoadEvent();
 
         // 恢复新场景的数据
-       // SaveLoadManager.Instance.RestoreCurrentSceneData();
+        SaveLoadManager.Instance.RestoreCurrentSceneData();
 
         // 开始渐变淡入并等待渐变完成
         yield return StartCoroutine(Fade(0f));
@@ -103,8 +103,8 @@ public class SceneControllerManager : SingletonMonobehaviour<SceneControllerMana
 
         // 如果该事件有订阅者，则调用该事件
         EventHandler.CallAfterSceneLoadEvent();
-
-        //SaveLoadManager.Instance.RestoreCurrentSceneData();
+        
+        SaveLoadManager.Instance.RestoreCurrentSceneData();
 
         // 场景加载完成后开始渐变淡入
         StartCoroutine(Fade(0f));

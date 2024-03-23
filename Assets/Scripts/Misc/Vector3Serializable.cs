@@ -1,4 +1,7 @@
 [System.Serializable]
+/// <summary>
+/// Serializable Vector3 class
+/// </summary>
 public class Vector3Serializable
 {
 
