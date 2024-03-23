@@ -180,7 +180,6 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     /// <summary>
     /// Get the item type description for an item type - returns the item type description as a string for a given ItemType
     /// </summary>
-
     public string GetItemTypeDescription(ItemType itemType)
     {
         string itemTypeDescription;
@@ -261,6 +260,31 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     public void SetSelectedInventoryItem(InventoryLocation inventoryLocation, int itemCode)
     {
         selectedInventoryItem[(int)inventoryLocation] = itemCode;
+    }
+
+    /// <summary>
+    /// 返回当前所选物品在给定的库存位置（inventoryLocation）中的物品详细信息（从 SO_ItemList 中获取），如果没有选中物品，则返回 null。
+    /// </summary>
+    public ItemDetails GetSelectedInventoryItemDetails(InventoryLocation inventoryLocation)
+    {
+        int itemCode = GetSelectedInventoryItem(inventoryLocation);
+
+        if (itemCode == -1)
+        {
+            return null;
+        }
+        else
+        {
+            return GetItemDetails(itemCode);
+        }
+    }
+
+    /// <summary>
+    /// 获取给定库存位置（inventoryLocation）中的所选物品 - 返回物品代码（itemCode），如果没有选中任何物品，则返回 -1。
+    /// </summary>
+    private int GetSelectedInventoryItem(InventoryLocation inventoryLocation)
+    {
+        return selectedInventoryItem[(int)inventoryLocation];
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Camera mainCamera;
     private Canvas parentCanvas;
     private Transform parentItem;
-    //private GridCursor gridCursor;
+    private GridCursor gridCursor;
     private Cursor cursor;
     public GameObject draggedItem;
 
@@ -42,9 +42,20 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private void Start()
     {
         mainCamera = Camera.main;
-        //parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
-        
+        gridCursor = FindObjectOfType<GridCursor>();
+
     }
+    private void ClearCursors()
+    {
+        // Disable cursor
+        gridCursor.DisableCursor();
+        //cursor.DisableCursor();
+
+        // Set item type to none
+        gridCursor.SelectedItemType = ItemType.none;
+        //cursor.SelectedItemType = ItemType.none;
+    }
+
 
     #region 鼠标拖拽
 
@@ -122,21 +133,15 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (itemDetails != null && isSelected)
         {
             // 如果物品详情不为空且未被选中
-            //if (gridCursor.CursorPositionIsValid)
-            if (true)
+            if (gridCursor.CursorPositionIsValid)
             {
                 // 获取鼠标位置的世界坐标
                 Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
-                Vector3Int gridPosition =GridPropertiesManager.Instance.grid.WorldToCell(worldPosition);
-                GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(gridPosition.x, gridPosition.y);
-                if (gridPropertyDetails != null && gridPropertyDetails.canDropItem)
-                {
-                    // 在鼠标位置创建物品的预制体
-                    GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
-
-                    //GameObject itemGameObject = Instantiate(itemPrefab, worldPosition, Quaternion.identity, parentItem);
-                    Item item = itemGameObject.GetComponent<Item>();
-                    item.ItemCode = itemDetails.itemCode;
+               
+                // 在鼠标位置创建物品的预制体
+                GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
+                 Item item = itemGameObject.GetComponent<Item>();
+                 item.ItemCode = itemDetails.itemCode;
 
                     // 从玩家的物品清单中移除物品
                     InventoryManager.Instance.RemoveItem(InventoryLocation.player, item.ItemCode);
@@ -146,7 +151,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                     {
                         ClearSelectedItem();
                     }
-                }
+                
             }
         }
     }
@@ -164,6 +169,24 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // 设置高亮的物品槽
         inventoryBar.SetHighlightedInventorySlots();
 
+        // Set use radius for cursors
+        gridCursor.ItemUseGridRadius = itemDetails.itemUseGridRadius;
+        //cursor.ItemUseRadius = itemDetails.itemUseRadius;
+
+        // If item requires a grid cursor then enable cursor
+        if (itemDetails.itemUseGridRadius > 0)
+        {
+            gridCursor.EnableCursor();
+        }
+        else
+        {
+            gridCursor.DisableCursor();
+        }
+
+
+        // Set item type
+        gridCursor.SelectedItemType = itemDetails.itemType;
+
         // 在物品清单中设置选中的物品
         InventoryManager.Instance.SetSelectedInventoryItem(InventoryLocation.player, itemDetails.itemCode);
 
@@ -179,7 +202,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void ClearSelectedItem()
     {
-        //ClearCursors();
+        ClearCursors();
 
         // 清除当前高亮的物品
         inventoryBar.ClearHighlightOnInventorySlots();
