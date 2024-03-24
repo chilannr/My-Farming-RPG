@@ -13,6 +13,8 @@ public static class Settings
 
     //Tilemap
     public const float gridCellSize = 1f; // 瓦片地图块大小
+    public static Vector2 cursorSize = Vector2.one; // 游戏光标大小
+
 
     // Player Movement
     public const float runningSpeed = 5.333f; // 跑步速度

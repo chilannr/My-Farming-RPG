@@ -515,11 +515,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66988896525b5ca46910811948559abf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 0}
   so_gridPropertiesArray:
   - {fileID: 11400000, guid: d278b20edb7648e45becd503a2d3db8a, type: 2}
   - {fileID: 11400000, guid: 84ab07bfccf3ce34ca98fc0ca18e2499, type: 2}
   - {fileID: 11400000, guid: f5deb638fbe080e4383c3c196f0a5147, type: 2}
+  dugGround:
+  - {fileID: 11400000, guid: 815bedc3bbfe75f4ba6c3f0a4c03181e, type: 2}
+  - {fileID: 11400000, guid: dda0ed9724769324f94e83c6ab9e5cdd, type: 2}
+  - {fileID: 11400000, guid: 8412f075fdcc9cb4c8163192af1ee93d, type: 2}
+  - {fileID: 11400000, guid: c65aaf21d77af6441b654e20fc5a2d85, type: 2}
+  - {fileID: 11400000, guid: edf340431a1099b448840110ba18119f, type: 2}
+  - {fileID: 11400000, guid: f382d3048865e0e4897506c853817a64, type: 2}
+  - {fileID: 11400000, guid: c106e414607ff7642be1aa67c168c000, type: 2}
+  - {fileID: 11400000, guid: d240de2eca7ff2f42a460cff96a30124, type: 2}
+  - {fileID: 11400000, guid: a1b5b7f56258e904f880177db2106aae, type: 2}
+  - {fileID: 11400000, guid: c12d5c2a1be01434d95e97b48a561220, type: 2}
+  - {fileID: 11400000, guid: 16cdc61f5036c034e9a1087f06f1c343, type: 2}
+  - {fileID: 11400000, guid: 2396a22f0ee87e445ad250bf2444f045, type: 2}
+  - {fileID: 11400000, guid: accb3716f0399614d8c56371800c7bf9, type: 2}
+  - {fileID: 11400000, guid: 2988d1e4b09124848bfb4abd313cf823, type: 2}
+  - {fileID: 11400000, guid: 3e03f6d3615cf4a45b2b5b935efc1e10, type: 2}
+  - {fileID: 11400000, guid: 02c69a85858c02343bb59b8ef2ac33a1, type: 2}
+  dugGroundRuleTile: {fileID: 11400000, guid: 86bcfd66620cfa648be9914249da0f26, type: 2}
 --- !u!114 &291603020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1161,7 +1178,7 @@ MonoBehaviour:
   fadeDuration: 1
   faderCanvasGroup: {fileID: 925917227}
   faderImage: {fileID: 925917228}
-  startingSceneName: 1
+  startingSceneName: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

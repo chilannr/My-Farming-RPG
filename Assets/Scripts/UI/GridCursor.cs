@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -124,6 +125,19 @@ public class GridCursor : MonoBehaviour
                     }
                     break;
 
+                case ItemType.Watering_tool:
+                case ItemType.Breaking_tool:
+                case ItemType.Chopping_tool:
+                case ItemType.Hoeing_tool:
+                case ItemType.Reaping_tool:
+                case ItemType.Collecting_tool:
+                    if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
+                    {
+                        SetCursorToInvalid();
+                        return;
+                    }
+                    break;
+
                 case ItemType.none:
                     break;
 
@@ -167,7 +181,85 @@ public class GridCursor : MonoBehaviour
         return gridPropertyDetails.canDropItem;
 
     }
+    /// <summary>
+    /// 测试光标对于目标gridPropertyDetails的工具的有效性。如果有效返回true,否则返回false
+    /// </summary>
+    private bool IsCursorValidForTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+    {
+        // 判断工具类型
+        switch (itemDetails.itemType)
+        {
+            case ItemType.Hoeing_tool:
+                // 如果是铲子工具，并且当前位置可以挖掘且未被挖掘过，则判断是否有可收获的物品
+                if (gridPropertyDetails.isDiggable && gridPropertyDetails.daysSinceDug == -1)
+                {
+                    // 获取光标位置上的物品列表
+                    //List<ItemDetails> itemsAtCursor = GetItemsAtCursor();
 
+                    // 判断是否有可收获的物品
+                    //foreach (ItemDetails item in itemsAtCursor)
+                    //{
+                    //    if (item.canBeHarvested)
+                    //    {
+                    //        return false;
+                    //    }
+                    //}
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            case ItemType.Watering_tool:
+                // 如果是浇水工具，并且当前位置已经挖掘过但未浇水，则返回true
+                if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            case ItemType.Chopping_tool:
+            case ItemType.Collecting_tool:
+            case ItemType.Breaking_tool:
+                // 如果是砍伐、收集或破坏工具
+                // 检查是否种植了种子
+                //if (HasSeeds())
+                //{
+                //    // 获取种子的详细信息
+                //    SeedDetails seedDetails = GetSeedDetails();
+
+                //    // 检查作物是否已经完全成长
+                //    if (gridPropertyDetails.growthStage == seedDetails.growthStages - 1)
+                //    {
+                //        // 检查工具是否可以用来收获作物
+                //        if (itemDetails.canHarvest)
+                //        {
+                //            return true;
+                //        }
+                //        else
+                //        {
+                //            return false;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        return false;
+                //    }
+                //}
+                //else
+                //{
+                //    return false;
+                //}
+
+            default:
+                return false;
+        }
+    }
     /// <summary>
     /// 设置光标对于目标gridPropertyDetails的种子的有效性。如果有效返回true,否则返回false
     /// </summary>
@@ -189,7 +281,10 @@ public class GridCursor : MonoBehaviour
         cursorImage.color = new Color(1f, 1f, 1f, 1f);
         CursorIsEnabled = true;
     }
-
+    public Vector3 GetWorldPositionForCursor()
+    {
+        return grid.CellToWorld(GetGridPositionForCursor());
+    }
     public Vector3Int GetGridPositionForCursor()
     {
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));  // z是相对于摄像机的物体的远近距离 - 摄像机在-10,所以物体在(-)-10前面 = 10
