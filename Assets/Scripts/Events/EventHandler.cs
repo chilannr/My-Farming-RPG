@@ -30,14 +30,14 @@ public static class EventHandler
             RemoveSelectedItemFromInventoryEvent();
     }
 
-    //// 收获动作效果事件
-    //public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
+    // 收获动作效果事件
+    public static event Action<Vector3, HarvestActionEffect> HarvestActionEffectEvent;
 
-    //public static void CallHarvestActionEffectEvent(Vector3 effectPosition, HarvestActionEffect harvestActionEffect)
-    //{
-    //    if (HarvestActionEffectEvent != null)
-    //        HarvestActionEffectEvent(effectPosition, harvestActionEffect);
-    //}
+    public static void CallHarvestActionEffectEvent(Vector3 effectPosition, HarvestActionEffect harvestActionEffect)
+    {
+        if (HarvestActionEffectEvent != null)
+            HarvestActionEffectEvent(effectPosition, harvestActionEffect);
+    }
 
     // 背包更新事件
     public static event Action<InventoryLocation, List<InventoryItem>> InventoryUpdatedEvent;

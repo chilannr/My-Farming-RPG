@@ -107,11 +107,22 @@ public enum ToolEffect
 
 public enum HarvestActionEffect
 {
+    // 落叶飘落效果
     deciduousLeavesFalling,
+
+    // 松果掉落效果
     pineConesFalling,
+
+    // 砍伐树木的效果
     choppingTreeTrunk,
+
+    // 石头破碎效果
     breakingStone,
+
+    // 收割效果
     reaping,
+
+    // 没有效果
     none
 }
 

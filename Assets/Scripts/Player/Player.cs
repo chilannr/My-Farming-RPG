@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
+    public GameObject canyonOakTreePrefab;
     private WaitForSeconds afterLiftToolAnimationPause;
     private WaitForSeconds afterUseToolAnimationPause;
     private AnimationOverrides animationOverrides;
@@ -543,7 +545,7 @@ public class Player : SingletonMonobehaviour<Player>
                         Vector3 effectPosition = new Vector3(itemArray[i].transform.position.x, itemArray[i].transform.position.y + Settings.gridCellSize / 2f, itemArray[i].transform.position.z);
 
                         // 触发收割效果
-                        //EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
+                        EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
 
                         // 播放声音
                         //AudioManager.Instance.PlaySound(SoundName.effectScythe);
@@ -571,15 +573,15 @@ public class Player : SingletonMonobehaviour<Player>
         }
 
         // Trigger Advance Day
-        if (Input.GetKeyDown(KeyCode.G))
+        if (Input.GetKey(KeyCode.G))
         {
             TimeManager.Instance.TestAdvanceGameDay();
         }
-        if (Input.GetKeyDown(KeyCode.L))
+        if(Input.GetMouseButtonDown(1))
         {
-           SceneControllerManager.Instance.FadeAndLoadScene(SceneName.Scene1_Farm.ToString(), transform.position);
+            GameObject tree = PoolManager.Instance.ReuseObject(canyonOakTreePrefab,mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z)),Quaternion.identity);
+            tree.SetActive(true);
         }
-
     }
 
 
