@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -11,8 +12,9 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     private Grid grid; // 网格对象
     private Dictionary<string, GridPropertyDetails> gridPropertyDictionary; // 网格属性字典
     [SerializeField] private SO_GridProperties[] so_gridPropertiesArray = null; // 网格属性数组
-    [SerializeField] private Tile[] dugGround = null;// 挖掘地面贴图
+
     [SerializeField] private RuleTile dugGroundRuleTile = null;// 挖掘地面规则瓷砖
+    [SerializeField] private RuleTile wateredGroundRuleTile = null;// 已浇水地面规则瓷砖
 
     private string _iSaveableUniqueID; // ISaveable的唯一标识符
     public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
@@ -33,6 +35,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         ISaveableRegister(); // 注册ISaveable
 
         EventHandler.AfterSceneLoadEvent += AfterSceneLoaded; // 注册场景加载完成事件
+        EventHandler.AdvanceGameDayEvent += AdvanceDay; // 注册游戏日进度事件
     }
 
     private void OnDisable()
@@ -40,6 +43,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         ISaveableDeregister(); // 注销ISaveable
 
         EventHandler.AfterSceneLoadEvent -= AfterSceneLoaded; // 注销场景加载完成事件
+        EventHandler.AdvanceGameDayEvent -= AdvanceDay; // 注销游戏日进度事件
     }
 
     private void Start()
@@ -64,148 +68,26 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         // Dug
         if (gridPropertyDetails.daysSinceDug > -1)
         {
-            //ConnectDugGround(gridPropertyDetails);
             ConnectDugGroundRuleTile(gridPropertyDetails);
         }
     }
-
+    public void DisplayWateredGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Watered
+        if (gridPropertyDetails.daysSinceWatered > -1)
+        {
+            ConnectWateredGroundRuleTile(gridPropertyDetails);
+        }
+    }
+    private void ConnectWateredGroundRuleTile(GridPropertyDetails gridPropertyDetails)
+    {
+        groundDecoration2.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 1), wateredGroundRuleTile);
+    }
     private void ConnectDugGroundRuleTile(GridPropertyDetails gridPropertyDetails)
     {
-        // 根据周围的挖掘的地块选择瓷砖
-        //Tile dugTile0 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
-        //groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), dugTile0);
         groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 1), dugGroundRuleTile);
     }
 
-    /// <summary>
-    /// 连接挖掘的地面。
-    /// 根据周围的挖掘的地块选择瓷砖。
-    /// </summary>
-    /// <param name="gridPropertyDetails">网格属性详情</param>
-    private void ConnectDugGround(GridPropertyDetails gridPropertyDetails)
-    {
-        // 根据周围的挖掘的地块选择瓷砖
-        Tile dugTile0 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
-        groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), dugTile0);
-
-        // 如果当前地块周围有挖掘的地块（上、下、左、右），则设置4个瓷砖
-        GridPropertyDetails adjacentGridPropertyDetails;
-
-        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
-        {
-            Tile dugTile1 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
-            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1, 0), dugTile1);
-        }
-
-        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
-        {
-            Tile dugTile2 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
-            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1, 0), dugTile2);
-        }
-
-        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
-        {
-            Tile dugTile3 = SetDugTile(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
-            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY, 0), dugTile3);
-        }
-
-        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
-        {
-            Tile dugTile4 = SetDugTile(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
-            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), dugTile4);
-        }
-    }
-    /// <summary>
-    /// 设置挖掘的瓷砖。
-    /// 根据周围的瓷砖是否被挖掘来确定要设置的瓷砖。
-    /// </summary>
-    /// <param name="xGrid">网格的X坐标</param>
-    /// <param name="yGrid">网格的Y坐标</param>
-    /// <returns>要设置的瓷砖</returns>
-    private Tile SetDugTile(int xGrid, int yGrid)
-    {
-        // 获取周围的瓷砖是否被挖掘
-        bool upDug = IsGridSquareDug(xGrid, yGrid + 1);
-        bool downDug = IsGridSquareDug(xGrid, yGrid - 1);
-        bool leftDug = IsGridSquareDug(xGrid - 1, yGrid);
-        bool rightDug = IsGridSquareDug(xGrid + 1, yGrid);
-
-        // 根据周围的瓷砖是否被挖掘来确定要设置的瓷砖
-        #region Set appropriate tile based on whether surrounding tiles are dug or not
-
-        if (!upDug && !downDug && !rightDug && !leftDug)
-        {
-            return dugGround[0];
-        }
-        else if (!upDug && downDug && rightDug && !leftDug)
-        {
-            return dugGround[1];
-        }
-        else if (!upDug && downDug && rightDug && leftDug)
-        {
-            return dugGround[2];
-        }
-        else if (!upDug && downDug && !rightDug && leftDug)
-        {
-            return dugGround[3];
-        }
-        else if (!upDug && downDug && !rightDug && !leftDug)
-        {
-            return dugGround[4];
-        }
-        else if (upDug && downDug && rightDug && !leftDug)
-        {
-            return dugGround[5];
-        }
-        else if (upDug && downDug && rightDug && leftDug)
-        {
-            return dugGround[6];
-        }
-        else if (upDug && downDug && !rightDug && leftDug)
-        {
-            return dugGround[7];
-        }
-        else if (upDug && downDug && !rightDug && !leftDug)
-        {
-            return dugGround[8];
-        }
-        else if (upDug && !downDug && rightDug && !leftDug)
-        {
-            return dugGround[9];
-        }
-        else if (upDug && !downDug && rightDug && leftDug)
-        {
-            return dugGround[10];
-        }
-        else if (upDug && !downDug && !rightDug && leftDug)
-        {
-            return dugGround[11];
-        }
-        else if (upDug && !downDug && !rightDug && !leftDug)
-        {
-            return dugGround[12];
-        }
-        else if (!upDug && !downDug && rightDug && !leftDug)
-        {
-            return dugGround[13];
-        }
-        else if (!upDug && !downDug && rightDug && leftDug)
-        {
-            return dugGround[14];
-        }
-        else if (!upDug && !downDug && !rightDug && leftDug)
-        {
-            return dugGround[15];
-        }
-
-        return null;
-
-        #endregion Set appropriate tile based on whether surrounding tiles are dug or not
-    }
 
     private bool IsGridSquareDug(int xGrid, int yGrid)
     {
@@ -401,7 +283,8 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
     /// <summary>
-    /// Set the grid property details to gridPropertyDetails for the tile at (gridX,gridY) for current scene
+    /// 设置网格属性详情。
+    /// 设置网格属性详情到网格属性字典中。
     /// </summary>
     public void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails)
     {
@@ -431,5 +314,62 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     public void ISaveableLoad(GameSave gameSave)
     {
         throw new System.NotImplementedException();
+    }
+    /// <summary>
+    /// 推进游戏中的一天。
+    /// 清除所有网格属性的显示，通过遍历所有的网格属性数组来循环所有的场景。
+    /// 获取场景的网格属性详情字典，如果一个作物被种植，增加生长天数。
+    /// 如果土地被浇水，清除水分。
+    /// 设置网格属性详情，以反映更改的值。
+    /// 显示网格属性详情。
+    /// </summary>
+    /// <param name="gameYear">游戏年份</param>
+    /// <param name="gameSeason">游戏季节</param>
+    /// <param name="gameDay">游戏天数</param>
+    /// <param name="gameDayOfWeek">游戏星期</param>
+    /// <param name="gameHour">游戏小时</param>
+    /// <param name="gameMinute">游戏分钟</param>
+    /// <param name="gameSecond">游戏秒数</param>
+    private void AdvanceDay(int gameYear, Season gameSeason, int gameDay, string gameDayOfWeek, int gameHour, int gameMinute, int gameSecond)
+    {
+        // 清除所有网格属性的显示
+        ClearDisplayGridPropertyDetails();
+
+        // 通过遍历所有的网格属性数组来循环所有的场景
+        foreach (SO_GridProperties so_GridProperties in so_gridPropertiesArray)
+        {
+            // 获取场景的网格属性详情字典
+            if (GameObjectSave.sceneData.TryGetValue(so_GridProperties.sceneName.ToString(), out SceneSave sceneSave))
+            {
+                if (sceneSave.gridPropertyDetailsDictionary != null)
+                {
+                    for (int i = sceneSave.gridPropertyDetailsDictionary.Count - 1; i >= 0; i--)
+                    {
+                        KeyValuePair<string, GridPropertyDetails> item = sceneSave.gridPropertyDetailsDictionary.ElementAt(i);
+
+                        GridPropertyDetails gridPropertyDetails = item.Value;
+
+                        // 更新所有网格属性以反映天数的增加
+                        // 如果一个作物被种植
+                        if (gridPropertyDetails.growthDays > -1)
+                        {
+                            gridPropertyDetails.growthDays += 1;
+                        }
+
+                        // 如果土地被浇水，清除水分
+                        if (gridPropertyDetails.daysSinceWatered > -1)
+                        {
+                            gridPropertyDetails.daysSinceWatered = -1;
+                        }
+
+                        // 设置网格属性详情
+                        SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails, sceneSave.gridPropertyDetailsDictionary);
+                    }
+                }
+            }
+        }
+
+        // 显示网格属性详情以反映更改的值
+        DisplayGridPropertyDetails();
     }
 }
