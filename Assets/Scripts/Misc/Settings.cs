@@ -15,6 +15,8 @@ public static class Settings
     public const float gridCellSize = 1f; // 瓦片地图块大小
     public static Vector2 cursorSize = Vector2.one; // 游戏光标大小
 
+    //Player
+    public const float playerCentreYOffset = 0.875f; // 玩家中心Y偏移量
 
     // Player Movement
     public const float runningSpeed = 5.333f; // 跑步速度
@@ -66,6 +68,11 @@ public static class Settings
     public const string ReapingTool = "Scythe"; // 镰刀工具
     public const string WateringTool = "Watering Can"; // 浇水工具
     public const string CollectingTool = "Basket"; // 收集工具
+
+    //Reaping
+    public const int maxCollidersToTestPerReapSwing = 15; // 最大测试每根刀刃的碰撞器数量
+    public const int maxTargetComponentsToDestroyPerReapSwing = 2; // 最大摧毁每根刀刃的目标组件数量
+    
 
     //Time System
     public const float secondsPerGameSecond = 0.012f; // 游戏时间每秒对应的实际时间

@@ -9,7 +9,7 @@ public class Player : SingletonMonobehaviour<Player>
     private WaitForSeconds afterUseToolAnimationPause;
     private AnimationOverrides animationOverrides;
     private GridCursor gridCursor;
-
+    private Cursor cursor;
     // Movement Parameters
     private float xInput;
     private float yInput;
@@ -88,9 +88,22 @@ public class Player : SingletonMonobehaviour<Player>
         //获取主相机
         mainCamera = Camera.main;
     }
+
+    private void OnEnable()
+    {
+        EventHandler.BeforeSceneUnloadFadeOutEvent +=DisablePlayerInputAndResetMovement ;
+        EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
+    }  
+    private void OnDisable()
+    {
+        EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
+        EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
+    }
+
     private void Start()
     {
         gridCursor = FindObjectOfType<GridCursor>();
+        cursor = FindObjectOfType<Cursor>();
         useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
         liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
         afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
@@ -216,7 +229,7 @@ public class Player : SingletonMonobehaviour<Player>
         {
             if (Input.GetMouseButton(0))
             {
-                if (gridCursor.CursorIsEnabled)
+                if (gridCursor.CursorIsEnabled || cursor.CursorIsEnabled)
                 {
                     // Get Cursor Grid Position
                     Vector3Int cursorGridPosition = gridCursor.GetGridPositionForCursor();
@@ -336,6 +349,13 @@ public class Player : SingletonMonobehaviour<Player>
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
                 break;
+            case ItemType.Reaping_tool:
+                if (cursor.CursorPositionIsValid)
+                {
+                    playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCentrePosition());
+                    ReapInPlayerDirectionAtCursor(itemDetails, playerDirection);
+                }
+                break;
             default:
                 break;
         }
@@ -349,6 +369,10 @@ public class Player : SingletonMonobehaviour<Player>
     {
         // Trigger animation
         StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
+    }
+    private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(ReapInPlayerDirectionAtCursorRoutine(itemDetails, playerDirection));
     }
     private IEnumerator WaterGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
     {
@@ -449,7 +473,91 @@ public class Player : SingletonMonobehaviour<Player>
         PlayerInputIsDisabled = false;
         playerToolUseDisabled = false;
     }
+   
 
+    private IEnumerator ReapInPlayerDirectionAtCursorRoutine(ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set tool animation to scythe in override animation
+        toolCharacterAttribute.partVariantType = PartVariantType.scythe;
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
+
+        // Reap in player direction
+        UseToolInPlayerDirection(itemDetails, playerDirection);
+
+        yield return useToolAnimationPause;
+
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+    private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        if (Input.GetMouseButton(0)) // 如果按下鼠标左键
+        {
+            switch (equippedItemDetails.itemType)
+            {
+                case ItemType.Reaping_tool: // 如果是收割工具
+                    if (playerDirection == Vector3Int.right)
+                    {
+                        isSwingingToolRight = true; // 设置正在向右挥动工具
+                    }
+                    else if (playerDirection == Vector3Int.left)
+                    {
+                        isSwingingToolLeft = true; // 设置正在向左挥动工具
+                    }
+                    else if (playerDirection == Vector3Int.up)
+                    {
+                        isSwingingToolUp = true; // 设置正在向上挥动工具
+                    }
+                    else if (playerDirection == Vector3Int.down)
+                    {
+                        isSwingingToolDown = true; // 设置正在向下挥动工具
+                    }
+                    break;
+            }
+
+            // 定义用于碰撞测试的正方形中心点
+            Vector2 point = new Vector2(GetPlayerCentrePosition().x + (playerDirection.x * (equippedItemDetails.itemUseRadius / 2f)), GetPlayerCentrePosition().y + playerDirection.y * (equippedItemDetails.itemUseRadius / 2f));
+
+            // 定义用于碰撞测试的正方形大小
+            Vector2 size = new Vector2(equippedItemDetails.itemUseRadius, equippedItemDetails.itemUseRadius);
+
+            // 获取位于中心点正方形内的2D碰撞体Item组件(受限于maxCollidersToTestPerReapSwing)
+            Item[] itemArray = HelperMethods.GetComponentsAtBoxLocationNonAlloc<Item>(Settings.maxCollidersToTestPerReapSwing, point, size, 0f);
+
+            int reapableItemCount = 0; // 可收割物品计数
+
+            // 遍历获取的所有物品
+            for (int i = itemArray.Length - 1; i >= 0; i--)
+            {
+                if (itemArray[i] != null)
+                {
+                    // 如果物品是可收割的,则销毁物品游戏对象
+                    if (InventoryManager.Instance.GetItemDetails(itemArray[i].ItemCode).itemType == ItemType.Reapable_scenary)
+                    {
+                        // 效果位置
+                        Vector3 effectPosition = new Vector3(itemArray[i].transform.position.x, itemArray[i].transform.position.y + Settings.gridCellSize / 2f, itemArray[i].transform.position.z);
+
+                        // 触发收割效果
+                        //EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
+
+                        // 播放声音
+                        //AudioManager.Instance.PlaySound(SoundName.effectScythe);
+
+                        Destroy(itemArray[i].gameObject);
+
+                        reapableItemCount++;
+                        if (reapableItemCount >= Settings.maxTargetComponentsToDestroyPerReapSwing)
+                            break; // 如果达到最大可销毁物品数,则退出循环
+                    }
+                }
+            }
+        }
+    }
     // TODO: Remove
     /// <summary>
     /// Temp routine for test input
@@ -544,8 +652,42 @@ public class Player : SingletonMonobehaviour<Player>
     {
         return mainCamera.WorldToViewportPoint(transform.position);
     }
+    public Vector3 GetPlayerCentrePosition()
+    {
+        return new Vector3(transform.position.x, transform.position.y + Settings.playerCentreYOffset, transform.position.z);
+    }
+    private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
+    {
+        if (
 
-
+            cursorPosition.x > playerPosition.x
+            &&
+            cursorPosition.y < (playerPosition.y + cursor.ItemUseRadius / 2f)
+            &&
+            cursorPosition.y > (playerPosition.y - cursor.ItemUseRadius / 2f)
+            )
+        {
+            return Vector3Int.right;
+        }
+        else if (
+            cursorPosition.x < playerPosition.x
+            &&
+            cursorPosition.y < (playerPosition.y + cursor.ItemUseRadius / 2f)
+            &&
+            cursorPosition.y > (playerPosition.y - cursor.ItemUseRadius / 2f)
+            )
+        {
+            return Vector3Int.left;
+        }
+        else if (cursorPosition.y > playerPosition.y)
+        {
+            return Vector3Int.up;
+        }
+        else
+        {
+            return Vector3Int.down;
+        }
+    }
 
 
 
