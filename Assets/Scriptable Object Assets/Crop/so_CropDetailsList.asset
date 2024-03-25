@@ -164,7 +164,7 @@ MonoBehaviour:
     harvestActionEffect: 3
     harvestSound: 140
     harvestToolItemCode: 1d270000
-    requiredHarvestActions: 01000000
+    requiredHarvestActions: 02000000
     cropProducedItemCode: 1f270000
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantity: 01000000
@@ -186,7 +186,7 @@ MonoBehaviour:
     harvestActionEffect: 3
     harvestSound: 140
     harvestToolItemCode: 1d270000
-    requiredHarvestActions: 02000000
+    requiredHarvestActions: 04000000
     cropProducedItemCode: 1f270000
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantity: 01000000
