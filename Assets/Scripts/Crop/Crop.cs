@@ -165,7 +165,7 @@ public class Crop : MonoBehaviour
 
     private void SpawnHarvestedItems(CropDetails cropDetails)
     {
-        // 生成将要产出的物品
+        // 生成将要产出的物品,参数i代表作物产出物品的种类
         for (int i = 0; i < cropDetails.cropProducedItemCode.Length; i++)
         {
             int cropsToProduce;
@@ -187,7 +187,7 @@ public class Crop : MonoBehaviour
                 if (cropDetails.spawnCropProducedAtPlayerPosition)
                 {
                     //  将物品添加到玩家背包
-                    //InventoryManager.Instance.AddItem(InventoryLocation.player,cropDetails.cropProducedItemCode[i]);
+                    InventoryManager.Instance.AddItem(InventoryLocation.player,cropDetails.cropProducedItemCode[i]);
                 }
                 else
                 {

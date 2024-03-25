@@ -82,7 +82,30 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         // 发送物品更新事件
         EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
     }
+    /// <summary>
+    /// 向指定的库存位置的库存列表中添加一个指定类型的物品
+    /// </summary>
+    /// <param name="inventoryLocation">库存位置</param>
+    /// <param name="itemCode">物品代码</param>
+    public void AddItem(InventoryLocation inventoryLocation, int itemCode)
+    {
+        List<InventoryItem> inventoryList = inventoryLists[(int)inventoryLocation];
 
+        // 检查库存中是否已经包含该物品
+        int itemPosition = FindItemInInventory(inventoryLocation, itemCode);
+
+        if (itemPosition != -1)
+        {
+            AddItemAtPosition(inventoryList, itemCode, itemPosition);
+        }
+        else
+        {
+            AddItemAtPosition(inventoryList, itemCode);
+        }
+
+        // 发送库存已更新的事件
+        EventHandler.CallInventoryUpdatedEvent(inventoryLocation, inventoryLists[(int)inventoryLocation]);
+    }
     private void CreateItemDetailsDictionary()
     {
         // 创建物品详情字典

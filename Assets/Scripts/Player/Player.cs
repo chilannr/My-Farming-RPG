@@ -6,100 +6,108 @@ using UnityEngine;
 
 public class Player : SingletonMonobehaviour<Player>
 {
-    public GameObject canyonOakTreePrefab;
+    // 等待动画暂停的时间
     private WaitForSeconds afterLiftToolAnimationPause;
     private WaitForSeconds afterUseToolAnimationPause;
+    private WaitForSeconds afterPickAnimationPause;
+
+    // 动画覆盖和光标引用
     private AnimationOverrides animationOverrides;
     private GridCursor gridCursor;
     private Cursor cursor;
-    // Movement Parameters
+
+    // 移动参数
     private float xInput;
     private float yInput;
-    public bool isWalking;
-    public bool isRunning;
+    private bool isCarrying = false;
     private bool isIdle;
-    private bool isCarrying;
-    private ToolEffect toolEffect = ToolEffect.none;
-    private bool isUsingToolRight;
-    private bool isUsingToolLeft;
-    private bool isUsingToolUp;
-    private bool isUsingToolDown;
-    private bool isLiftingToolRight;
-    private bool isLiftingToolLeft;
-    private bool isLiftingToolUp;
     private bool isLiftingToolDown;
-    private bool isPickingRight;
-    private bool isPickingLeft;
+    private bool isLiftingToolLeft;
+    private bool isLiftingToolRight;
+    private bool isLiftingToolUp;
+    private bool isRunning;
+    private bool isUsingToolDown;
+    private bool isUsingToolLeft;
+    private bool isUsingToolRight;
+    private bool isUsingToolUp;
+    private bool isSwingingToolDown;
+    private bool isSwingingToolLeft;
+    private bool isSwingingToolRight;
+    private bool isSwingingToolUp;
+    private bool isWalking;
     private bool isPickingUp;
     private bool isPickingDown;
-    private bool isSwingingToolRight;
-    private bool isSwingingToolLeft;
-    private bool isSwingingToolUp;
-    private bool isSwingingToolDown;
-    private bool idleUp;
-    private bool idleDown;
-    private bool idleLeft;
-    private bool idleRight;
+    private bool isPickingLeft;
+    private bool isPickingRight;
+    private WaitForSeconds liftToolAnimationPause;
+    private WaitForSeconds pickAnimationPause;
 
     private Camera mainCamera;
-
     private bool playerToolUseDisabled = false;
 
-    private Rigidbody2D rigidBody2D;
+    private ToolEffect toolEffect = ToolEffect.none;
 
-    private WaitForSeconds liftToolAnimationPause;
+    private Rigidbody2D rigidBody2D;
     private WaitForSeconds useToolAnimationPause;
 
-#pragma warning disable 414
     private Direction playerDirection;
-#pragma warning restore 414
-
-
 
     private List<CharacterAttribute> characterAttributeCustomisationList;
     private float movementSpeed;
 
-
-    [Tooltip("Should be populated in the prefab with the equipped item sprite renderer")]
+    [Tooltip("应该在预制体中填充装备的物品精灵渲染器")]
     [SerializeField] private SpriteRenderer equippedItemSpriteRenderer = null;
 
-    // Player attributes that can be swapped
+    // 可以交换的玩家属性
     private CharacterAttribute armsCharacterAttribute;
-
     private CharacterAttribute toolCharacterAttribute;
 
-
     private bool _playerInputIsDisabled = false;
-
     public bool PlayerInputIsDisabled { get => _playerInputIsDisabled; set => _playerInputIsDisabled = value; }
+
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
     protected override void Awake()
     {
         base.Awake();
+
         rigidBody2D = GetComponent<Rigidbody2D>();
 
         animationOverrides = GetComponentInChildren<AnimationOverrides>();
 
-        // Initialise swappable character attributes
+        // 初始化可交换的角色属性
         armsCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.arms, PartVariantColour.none, PartVariantType.none);
         toolCharacterAttribute = new CharacterAttribute(CharacterPartAnimator.tool, PartVariantColour.none, PartVariantType.hoe);
 
-        // Initialise character attribute list
+        // 初始化角色属性列表
         characterAttributeCustomisationList = new List<CharacterAttribute>();
 
+        // 获取游戏对象的唯一ID并创建保存数据对象
+        //ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
 
-        //获取主相机
+        GameObjectSave = new GameObjectSave();
+
+        // 获取主摄像机的引用
         mainCamera = Camera.main;
+    }
+
+    private void OnDisable()
+    {
+        //ISaveableDeregister();
+
+        EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
+        EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
     }
 
     private void OnEnable()
     {
-        EventHandler.BeforeSceneUnloadFadeOutEvent +=DisablePlayerInputAndResetMovement ;
+        //ISaveableRegister();
+
+        EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
-    }  
-    private void OnDisable()
-    {
-        EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
-        EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
     }
 
     private void Start()
@@ -108,36 +116,45 @@ public class Player : SingletonMonobehaviour<Player>
         cursor = FindObjectOfType<Cursor>();
         useToolAnimationPause = new WaitForSeconds(Settings.useToolAnimationPause);
         liftToolAnimationPause = new WaitForSeconds(Settings.liftToolAnimationPause);
+        pickAnimationPause = new WaitForSeconds(Settings.pickAnimationPause);
         afterUseToolAnimationPause = new WaitForSeconds(Settings.afterUseToolAnimationPause);
         afterLiftToolAnimationPause = new WaitForSeconds(Settings.afterLiftToolAnimationPause);
+        afterPickAnimationPause = new WaitForSeconds(Settings.afterPickAnimationPause);
     }
+
     private void Update()
     {
         #region Player Input
+
         if (!PlayerInputIsDisabled)
         {
             ResetAnimationTriggers();
+
             PlayerMovementInput();
+
             PlayerWalkInput();
-            PlayerTestInput();
+
             PlayerClickInput();
 
-            // Send event to any listeners for player movement input
+            PlayerTestInput();
+
+            // 向任何监听玩家移动输入的事件发送事件
             EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect,
-                    isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown,
-                    isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown,
-                    isPickingRight, isPickingLeft, isPickingUp, isPickingDown,
-                    isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown,
-                    false, false, false, false);
+                isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown,
+                isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown,
+                isPickingRight, isPickingLeft, isPickingUp, isPickingDown,
+                isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown,
+                false, false, false, false);
         }
 
-
-        #endregion
+        #endregion Player Input
     }
+
     private void FixedUpdate()
     {
         PlayerMovement();
     }
+
     private void PlayerMovement()
     {
         Vector2 move = new Vector2(xInput * movementSpeed * Time.deltaTime, yInput * movementSpeed * Time.deltaTime);
@@ -233,10 +250,10 @@ public class Player : SingletonMonobehaviour<Player>
             {
                 if (gridCursor.CursorIsEnabled || cursor.CursorIsEnabled)
                 {
-                    // Get Cursor Grid Position
+                    // 获取光标在网格上的位置
                     Vector3Int cursorGridPosition = gridCursor.GetGridPositionForCursor();
 
-                    // Get Player Grid Position
+                    // 获取玩家在网格上的位置
                     Vector3Int playerGridPosition = gridCursor.GetGridPositionForPlayer();
 
                     ProcessPlayerClickInput(cursorGridPosition, playerGridPosition);
@@ -245,18 +262,21 @@ public class Player : SingletonMonobehaviour<Player>
         }
     }
 
+    /// <summary>
+    /// 处理玩家点击输入
+    /// </summary>
+    /// <param name="cursorGridPosition">光标在网格上的位置</param>
+    /// <param name="playerGridPosition">玩家在网格上的位置</param>
     private void ProcessPlayerClickInput(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
     {
-        // 重置移动
         ResetMovement();
 
-        // 获取玩家点击的方向
         Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
 
-        // 获取网格属性详情
+        // 获取光标位置的网格属性详情（GridCursor验证例程确保网格属性详情不为null）
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
 
-        // 获取选定的物品详情
+        // 获取所选物品的详情
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
 
         if (itemDetails != null)
@@ -266,7 +286,6 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Seed:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        // 处理种子的点击输入
                         ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
                     }
                     break;
@@ -274,7 +293,6 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Commodity:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        // 处理商品的点击输入
                         ProcessPlayerClickInputCommodity(itemDetails);
                     }
                     break;
@@ -285,7 +303,6 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
-                    // 处理工具的点击输入
                     ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
                     break;
 
@@ -353,6 +370,12 @@ public class Player : SingletonMonobehaviour<Player>
                 if (gridCursor.CursorPositionIsValid)
                 {
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                }
+                break;
+            case ItemType.Collecting_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
             case ItemType.Reaping_tool:
@@ -583,6 +606,102 @@ public class Player : SingletonMonobehaviour<Player>
             }
         }
     }
+    private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        // Play sound
+        //AudioManager.Instance.PlaySound(SoundName.effectBasket);
+
+        StartCoroutine(CollectInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+    private IEnumerator CollectInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+
+        yield return pickAnimationPause;
+
+        // After animation pause
+        yield return afterPickAnimationPause;
+
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+    /// <summary>
+    /// 处理玩家方向上的装备物品作用于作物
+    /// </summary>
+    /// <param name="playerDirection">玩家方向</param>
+    /// <param name="equippedItemDetails">装备的物品详情</param>
+    /// <param name="gridPropertyDetails">网格属性详情</param>
+    private void ProcessCropWithEquippedItemInPlayerDirection(Vector3Int playerDirection, ItemDetails equippedItemDetails, GridPropertyDetails gridPropertyDetails)
+    {
+        switch (equippedItemDetails.itemType)
+        {
+            case ItemType.Chopping_tool:
+            case ItemType.Breaking_tool:
+                if (playerDirection == Vector3Int.right)
+                {
+                    isUsingToolRight = true;
+                }
+                else if (playerDirection == Vector3Int.left)
+                {
+                    isUsingToolLeft = true;
+                }
+                else if (playerDirection == Vector3Int.up)
+                {
+                    isUsingToolUp = true;
+                }
+                else if (playerDirection == Vector3Int.down)
+                {
+                    isUsingToolDown = true;
+                }
+                break;
+
+            case ItemType.Collecting_tool:
+                if (playerDirection == Vector3Int.right)
+                {
+                    isPickingRight = true;
+                }
+                else if (playerDirection == Vector3Int.left)
+                {
+                    isPickingLeft = true;
+                }
+                else if (playerDirection == Vector3Int.up)
+                {
+                    isPickingUp = true;
+                }
+                else if (playerDirection == Vector3Int.down)
+                {
+                    isPickingDown = true;
+                }
+                break;
+
+            case ItemType.none:
+                break;
+        }
+
+        // 获取光标位置的作物
+        Crop crop = GridPropertiesManager.Instance.GetCropObjectAtGridLocation(gridPropertyDetails);
+
+        // 执行作物的工具操作
+        if (crop != null)
+        {
+            switch (equippedItemDetails.itemType)
+            {
+                case ItemType.Chopping_tool:
+                case ItemType.Breaking_tool:
+                    crop.ProcessToolAction(equippedItemDetails, isUsingToolRight, isUsingToolLeft, isUsingToolDown, isUsingToolUp);
+                    break;
+
+                case ItemType.Collecting_tool:
+                    crop.ProcessToolAction(equippedItemDetails, isPickingRight, isPickingLeft, isPickingDown, isPickingUp);
+                    break;
+            }
+        }
+    }
+
+
     // TODO: Remove
     /// <summary>
     /// Temp routine for test input
@@ -599,11 +718,6 @@ public class Player : SingletonMonobehaviour<Player>
         if (Input.GetKeyDown(KeyCode.G))
         {
             TimeManager.Instance.TestAdvanceGameDay();
-        }
-        if(Input.GetMouseButtonDown(1))
-        {
-            GameObject tree = PoolManager.Instance.ReuseObject(canyonOakTreePrefab,mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z)),Quaternion.identity);
-            tree.SetActive(true);
         }
     }
 

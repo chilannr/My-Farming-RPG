@@ -2071,6 +2071,7 @@ MonoBehaviour:
   cursorRectTransform: {fileID: 1363046306}
   greenCursorSprite: {fileID: 21300000, guid: 2e92a61802edadc4495e4d901e3a97cb, type: 3}
   redCursorSprite: {fileID: 21300000, guid: a605f55636af56b47b309a2177079511, type: 3}
+  so_CropDetailsList: {fileID: 11400000, guid: 24962bc1eb869cd4fa564cf48865529b, type: 2}
 --- !u!225 &1288816259
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4344,9 +4345,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d3e0ac9db288894396d25908e53d873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canyonOakTreePrefab: {fileID: 5261772260366502979, guid: 80a6a188f97113044bbc8f4e5c71dc9d, type: 3}
-  isWalking: 0
-  isRunning: 0
   equippedItemSpriteRenderer: {fileID: 4506798368216165393}
 --- !u!114 &4779999386012893917
 MonoBehaviour:

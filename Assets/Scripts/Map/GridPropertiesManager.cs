@@ -122,7 +122,13 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             return false;
         }
     }
-
+    /// <summary>
+    /// Get the grid property details for the tile at (gridX,gridY).  If no grid property details exist null is returned and can assume that all grid property details values are null or false
+    /// </summary>
+    public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY)
+    {
+        return GetGridPropertyDetails(gridX, gridY, gridPropertyDictionary);
+    }
     private void DisplayGridPropertyDetails()
     {
         
@@ -135,13 +141,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             DisplayPlantedCrop(gridPropertyDetails);
         }
     }
-    /// <summary>
-    /// Returns Crop Details for the provided seedItemCode
-    /// </summary>
-    public CropDetails GetCropDetails(int seedItemCode)
-    {
-        return so_CropDetailsList.GetCropDetails(seedItemCode);
-    }
+
     /// <summary>
     /// 显示种植的作物
     /// </summary>
@@ -291,21 +291,20 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         groundDecoration2 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2).GetComponent<Tilemap>();
 
     }
-
     /// <summary>
-    /// Returns the gridPropertyDetails at the gridlocation for the supplied dictionary, or null if no properties exist at that location.
+    /// 返回给定字典中网格位置的gridPropertyDetails，如果该位置不存在属性，则返回null。
     /// </summary>
     public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY, Dictionary<string, GridPropertyDetails> gridPropertyDictionary)
     {
-        // Construct key from coordinate
+        // 从坐标构造键
         string key = "x" + gridX + "y" + gridY;
 
         GridPropertyDetails gridPropertyDetails;
 
-        // Check if grid property details exist forcoordinate and retrieve
+        // 检查是否存在于坐标中的网格属性细节，并检索
         if (!gridPropertyDictionary.TryGetValue(key, out gridPropertyDetails))
         {
-            // if not found
+            // 如果未找到
             return null;
         }
         else
@@ -315,11 +314,35 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
     /// <summary>
-    /// Get the grid property details for the tile at (gridX,gridY).  If no grid property details exist null is returned and can assume that all grid property details values are null or false
+    /// 返回gridX，gridY位置的作物对象，如果未找到作物，则返回null。
     /// </summary>
-    public GridPropertyDetails GetGridPropertyDetails(int gridX, int gridY)
+    public Crop GetCropObjectAtGridLocation(GridPropertyDetails gridPropertyDetails)
     {
-        return GetGridPropertyDetails(gridX, gridY, gridPropertyDictionary);
+        Vector3 worldPosition = grid.GetCellCenterWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+        Collider2D[] collider2DArray = Physics2D.OverlapPointAll(worldPosition);
+
+        // 循环遍历碰撞体以获取作物游戏对象
+        Crop crop = null;
+
+        for (int i = 0; i < collider2DArray.Length; i++)
+        {
+            crop = collider2DArray[i].gameObject.GetComponentInParent<Crop>();
+            if (crop != null && crop.cropGridPosition == new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY))
+                break;
+            crop = collider2DArray[i].gameObject.GetComponentInChildren<Crop>();
+            if (crop != null && crop.cropGridPosition == new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY))
+                break;
+        }
+
+        return crop;
+    }
+
+    /// <summary>
+    /// 返回提供的seedItemCode的作物详情。
+    /// </summary>
+    public CropDetails GetCropDetails(int seedItemCode)
+    {
+        return so_CropDetailsList.GetCropDetails(seedItemCode);
     }
 
     public void ISaveableDeregister()

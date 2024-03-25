@@ -64,7 +64,7 @@ MonoBehaviour:
   - itemCode: 10004
     itemType: 3
     itemDescription: A Basic Hoe
-    itemSprite: {fileID: 21300094, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
+    itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
     itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
     itemUseGridRadius: 1
     itemUseRadius: 0
@@ -138,7 +138,7 @@ MonoBehaviour:
     itemDescription: Canyon Oak Tree Stump
     itemSprite: {fileID: 7154603021615155856, guid: d241c496741a12d4290e12ba81dd6724, type: 3}
     itemLongDescription: 
-    itemUseGridRadius: 
+    itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 0
     canBePickedUp: 0

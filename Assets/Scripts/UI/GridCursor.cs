@@ -11,6 +11,7 @@ public class GridCursor : MonoBehaviour
     [SerializeField] private RectTransform cursorRectTransform = null; // 光标矩形变换
     [SerializeField] private Sprite greenCursorSprite = null; // 绿色光标精灵
     [SerializeField] private Sprite redCursorSprite = null; // 红色光标精灵
+    [SerializeField] private SO_CropDetailsList so_CropDetailsList = null; // 作物详细信息列表
 
     private bool _cursorPositionIsValid = false;
     public bool CursorPositionIsValid { get => _cursorPositionIsValid; set => _cursorPositionIsValid = value; } // 光标位置是否有效
@@ -182,30 +183,51 @@ public class GridCursor : MonoBehaviour
 
     }
     /// <summary>
-    /// 测试光标对于目标gridPropertyDetails的工具的有效性。如果有效返回true,否则返回false
+    /// 根据目标的gridPropertyDetails设置光标是否对工具有效。如果有效则返回true，否则返回false。
     /// </summary>
+    /// <param name="gridPropertyDetails">目标的GridPropertyDetails</param>
+    /// <param name="itemDetails">工具的ItemDetails</param>
+    /// <returns>如果光标有效则返回true，否则返回false</returns>
     private bool IsCursorValidForTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
-        // 判断工具类型
+        // 根据工具类型进行判断
         switch (itemDetails.itemType)
         {
             case ItemType.Hoeing_tool:
-                // 如果是铲子工具，并且当前位置可以挖掘且未被挖掘过，则判断是否有可收获的物品
-                if (gridPropertyDetails.isDiggable && gridPropertyDetails.daysSinceDug == -1)
+                if (gridPropertyDetails.isDiggable == true && gridPropertyDetails.daysSinceDug == -1)
                 {
+                    #region 需要获取光标位置上的物品列表，以便检查是否可收割
+
+                    // 获取光标的世界坐标
+                    Vector3 cursorWorldPosition = new Vector3(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+
                     // 获取光标位置上的物品列表
-                    //List<ItemDetails> itemsAtCursor = GetItemsAtCursor();
+                    List<Item> itemList = new List<Item>();
 
-                    // 判断是否有可收获的物品
-                    //foreach (ItemDetails item in itemsAtCursor)
-                    //{
-                    //    if (item.canBeHarvested)
-                    //    {
-                    //        return false;
-                    //    }
-                    //}
+                    HelperMethods.GetComponentsAtBoxLocation<Item>(out itemList, cursorWorldPosition, Settings.cursorSize, 0f);
 
-                    return true;
+                    #endregion 需要获取光标位置上的物品列表，以便检查是否可收割
+
+                    // 遍历找到的物品，检查是否可收割 - 不允许玩家在可收割的场景物品上挖掘
+                    bool foundReapable = false;
+
+                    foreach (Item item in itemList)
+                    {
+                        if (InventoryManager.Instance.GetItemDetails(item.ItemCode).itemType == ItemType.Reapable_scenary)
+                        {
+                            foundReapable = true;
+                            break;
+                        }
+                    }
+
+                    if (foundReapable)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
                 else
                 {
@@ -213,7 +235,6 @@ public class GridCursor : MonoBehaviour
                 }
 
             case ItemType.Watering_tool:
-                // 如果是浇水工具，并且当前位置已经挖掘过但未浇水，则返回true
                 if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1)
                 {
                     return true;
@@ -226,35 +247,39 @@ public class GridCursor : MonoBehaviour
             case ItemType.Chopping_tool:
             case ItemType.Collecting_tool:
             case ItemType.Breaking_tool:
-                // 如果是砍伐、收集或破坏工具
-                // 检查是否种植了种子
-                //if (HasSeeds())
-                //{
-                //    // 获取种子的详细信息
-                //    SeedDetails seedDetails = GetSeedDetails();
 
-                //    // 检查作物是否已经完全成长
-                //    if (gridPropertyDetails.growthStage == seedDetails.growthStages - 1)
-                //    {
-                //        // 检查工具是否可以用来收获作物
-                //        if (itemDetails.canHarvest)
-                //        {
-                //            return true;
-                //        }
-                //        else
-                //        {
-                //            return false;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        return false;
-                //    }
-                //}
-                //else
-                //{
-                //    return false;
-                //}
+                // 检查是否可以用选中的工具收获物品，检查物品是否已经完全成长
+
+                // 检查是否种植了作物
+                if (gridPropertyDetails.seedItemCode != -1)
+                {
+                    // 获取种子的作物详情
+                    CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+
+                    // 如果找到了作物详情
+                    if (cropDetails != null)
+                    {
+                        // 检查作物是否已经完全成长
+                        if (gridPropertyDetails.growthDays >= cropDetails.growthDays[cropDetails.growthDays.Length - 1])
+                        {
+                            // 检查是否可以用选中的工具收获作物
+                            if (cropDetails.CanUseToolToHarvestCrop(itemDetails.itemCode))
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return false;
 
             default:
                 return false;
