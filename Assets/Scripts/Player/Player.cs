@@ -355,9 +355,15 @@ public class Player : SingletonMonobehaviour<Player>
             EventHandler.CallDropSelectedItemEvent();
         }
     }
+    /// <summary>
+    /// 处理玩家点击工具输入
+    /// </summary>
+    /// <param name="gridPropertyDetails">网格属性详情</param>
+    /// <param name="itemDetails">物品详情</param>
+    /// <param name="playerDirection">玩家方向</param>
     private void ProcessPlayerClickInputTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
     {
-        // Switch on tool
+        // 根据工具类型进行操作
         switch (itemDetails.itemType)
         {
             case ItemType.Hoeing_tool:
@@ -366,18 +372,35 @@ public class Player : SingletonMonobehaviour<Player>
                     HoeGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
                 break;
+
             case ItemType.Watering_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
                     WaterGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
                 break;
+
+            case ItemType.Chopping_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    ChopInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                }
+                break;
+
             case ItemType.Collecting_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
                     CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
+
+            case ItemType.Breaking_tool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    BreakInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                }
+                break;
+
             case ItemType.Reaping_tool:
                 if (cursor.CursorPositionIsValid)
                 {
@@ -385,6 +408,7 @@ public class Player : SingletonMonobehaviour<Player>
                     ReapInPlayerDirectionAtCursor(itemDetails, playerDirection);
                 }
                 break;
+
             default:
                 break;
         }
@@ -417,10 +441,6 @@ public class Player : SingletonMonobehaviour<Player>
     {
         // Trigger animation
         StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
-    }
-    private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
-    {
-        StartCoroutine(ReapInPlayerDirectionAtCursorRoutine(itemDetails, playerDirection));
     }
     private IEnumerator WaterGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
     {
@@ -523,25 +543,7 @@ public class Player : SingletonMonobehaviour<Player>
     }
    
 
-    private IEnumerator ReapInPlayerDirectionAtCursorRoutine(ItemDetails itemDetails, Vector3Int playerDirection)
-    {
-        PlayerInputIsDisabled = true;
-        playerToolUseDisabled = true;
 
-        // Set tool animation to scythe in override animation
-        toolCharacterAttribute.partVariantType = PartVariantType.scythe;
-        characterAttributeCustomisationList.Clear();
-        characterAttributeCustomisationList.Add(toolCharacterAttribute);
-        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
-
-        // Reap in player direction
-        UseToolInPlayerDirection(itemDetails, playerDirection);
-
-        yield return useToolAnimationPause;
-
-        PlayerInputIsDisabled = false;
-        playerToolUseDisabled = false;
-    }
     private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         if (Input.GetMouseButton(0)) // 如果按下鼠标左键
@@ -606,13 +608,58 @@ public class Player : SingletonMonobehaviour<Player>
             }
         }
     }
+
+
+    /// <summary>
+    /// 在玩家方向砍伐物品
+    /// </summary>
+    /// <param name="gridPropertyDetails">网格属性详情</param>
+    /// <param name="equippedItemDetails">已装备物品详情</param>
+    /// <param name="playerDirection">玩家方向</param>
+    private void ChopInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        // 播放声音
+        //AudioManager.Instance.PlaySound(SoundName.effectAxe);
+
+        // 触发动画
+        StartCoroutine(ChopInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+
+    private IEnumerator ChopInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // 设置工具动画为斧头
+        toolCharacterAttribute.partVariantType = PartVariantType.axe;
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
+
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+
+        yield return useToolAnimationPause;
+
+        // 动画暂停后
+        yield return afterUseToolAnimationPause;
+
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+    /// <summary>
+    /// 在玩家方向收集物品
+    /// </summary>
+    /// <param name="gridPropertyDetails">网格属性详情</param>
+    /// <param name="equippedItemDetails">已装备物品详情</param>
+    /// <param name="playerDirection">玩家方向</param>
     private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
-        // Play sound
+        // 播放声音
         //AudioManager.Instance.PlaySound(SoundName.effectBasket);
 
         StartCoroutine(CollectInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }
+
     private IEnumerator CollectInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         PlayerInputIsDisabled = true;
@@ -622,8 +669,74 @@ public class Player : SingletonMonobehaviour<Player>
 
         yield return pickAnimationPause;
 
-        // After animation pause
+        // 动画暂停后
         yield return afterPickAnimationPause;
+
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+    /// <summary>
+    /// 在玩家方向破坏物品
+    /// </summary>
+    /// <param name="gridPropertyDetails">网格属性详情</param>
+    /// <param name="equippedItemDetails">已装备物品详情</param>
+    /// <param name="playerDirection">玩家方向</param>
+    private void BreakInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        // 播放声音
+        //AudioManager.Instance.PlaySound(SoundName.effectPickaxe);
+
+        StartCoroutine(BreakInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
+    }
+
+    private IEnumerator BreakInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
+    {
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // 设置工具动画为镐
+        toolCharacterAttribute.partVariantType = PartVariantType.pickaxe;
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
+
+        ProcessCropWithEquippedItemInPlayerDirection(playerDirection, equippedItemDetails, gridPropertyDetails);
+
+        yield return useToolAnimationPause;
+
+        // 动画暂停后
+        yield return afterUseToolAnimationPause;
+
+        PlayerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+    /// <summary>
+    /// 在光标位置以玩家方向收割
+    /// </summary>
+    /// <param name="itemDetails">物品详情</param>
+    /// <param name="playerDirection">玩家方向</param>
+    private void ReapInPlayerDirectionAtCursor(ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(ReapInPlayerDirectionAtCursorRoutine(itemDetails, playerDirection));
+    }
+
+    private IEnumerator ReapInPlayerDirectionAtCursorRoutine(ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        PlayerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // 设置工具动画为镰刀
+        toolCharacterAttribute.partVariantType = PartVariantType.scythe;
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
+
+        // 在玩家方向收割
+        UseToolInPlayerDirection(itemDetails, playerDirection);
+
+        yield return useToolAnimationPause;
 
         PlayerInputIsDisabled = false;
         playerToolUseDisabled = false;

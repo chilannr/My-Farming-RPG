@@ -169,7 +169,6 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
                     if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
                     {
                         currentGrowthStage = i;
-                        Debug.Log("Current growth stage: " + currentGrowthStage);
                         break;
                     }
                 }
