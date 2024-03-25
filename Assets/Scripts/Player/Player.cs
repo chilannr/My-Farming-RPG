@@ -247,15 +247,16 @@ public class Player : SingletonMonobehaviour<Player>
 
     private void ProcessPlayerClickInput(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
     {
+        // 重置移动
         ResetMovement();
 
+        // 获取玩家点击的方向
         Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
 
-        // Get Grid property details at cursor position (the GridCursor validation routine ensures that grid property details are not null)
+        // 获取网格属性详情
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
 
-
-        // Get Selected item details
+        // 获取选定的物品详情
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
 
         if (itemDetails != null)
@@ -265,6 +266,7 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Seed:
                     if (Input.GetMouseButtonDown(0))
                     {
+                        // 处理种子的点击输入
                         ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
                     }
                     break;
@@ -272,6 +274,7 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Commodity:
                     if (Input.GetMouseButtonDown(0))
                     {
+                        // 处理商品的点击输入
                         ProcessPlayerClickInputCommodity(itemDetails);
                     }
                     break;
@@ -282,6 +285,7 @@ public class Player : SingletonMonobehaviour<Player>
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
+                    // 处理工具的点击输入
                     ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
                     break;
 
@@ -320,7 +324,7 @@ public class Player : SingletonMonobehaviour<Player>
     {
         if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.seedItemCode == -1)
         {
-            //PlantSeedAtCursor(gridPropertyDetails, itemDetails);
+            PlantSeedAtCursor(gridPropertyDetails, itemDetails);
         }
         else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
         {
@@ -360,6 +364,25 @@ public class Player : SingletonMonobehaviour<Player>
                 break;
             default:
                 break;
+        }
+    }
+    private void PlantSeedAtCursor(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
+    {
+        // 如果我们有种子的作物详情，则进行处理
+        if (GridPropertiesManager.Instance.GetCropDetails(itemDetails.itemCode) != null)
+        {
+            // 使用种子详情更新网格属性
+            gridPropertyDetails.seedItemCode = itemDetails.itemCode;
+            gridPropertyDetails.growthDays = 0;
+
+            // 在网格属性详情处显示种植的作物
+            GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
+
+            // 从库存中移除物品
+            EventHandler.CallRemoveSelectedItemFromInventoryEvent();
+
+            // 播放种植声音
+            //AudioManager.Instance.PlaySound(SoundName.effectPlantingSound);
         }
     }
     private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
@@ -573,7 +596,7 @@ public class Player : SingletonMonobehaviour<Player>
         }
 
         // Trigger Advance Day
-        if (Input.GetKey(KeyCode.G))
+        if (Input.GetKeyDown(KeyCode.G))
         {
             TimeManager.Instance.TestAdvanceGameDay();
         }

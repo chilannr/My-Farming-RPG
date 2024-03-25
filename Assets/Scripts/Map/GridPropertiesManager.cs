@@ -7,10 +7,12 @@ using UnityEngine.Tilemaps;
 [RequireComponent(typeof(GenerateGUID))]
 public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManager>, ISaveable
 {
+    private Transform cropParentTransform;// 作物父物体
     private Tilemap groundDecoration1;// 地面装饰1
     private Tilemap groundDecoration2;// 地面装饰2
     private Grid grid; // 网格对象
     private Dictionary<string, GridPropertyDetails> gridPropertyDictionary; // 网格属性字典
+    [SerializeField] private SO_CropDetailsList so_CropDetailsList = null;// 作物详情列表
     [SerializeField] private SO_GridProperties[] so_gridPropertiesArray = null; // 网格属性数组
 
     [SerializeField] private RuleTile dugGroundRuleTile = null;// 挖掘地面规则瓷砖
@@ -53,14 +55,28 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
     private void ClearDisplayGroundDecorations()
     {
-        // Remove ground decorations
+        //清除地面装饰
         groundDecoration1.ClearAllTiles();
         groundDecoration2.ClearAllTiles();
+    }
+    private void ClearDisplayAllPlantedCrops()
+    {
+        //清除所有种植的作物
+
+        Crop[] cropArray;
+        cropArray = FindObjectsOfType<Crop>();
+
+        foreach (Crop crop in cropArray)
+        {
+            Destroy(crop.gameObject);
+        }
     }
 
     private void ClearDisplayGridPropertyDetails()
     {
         ClearDisplayGroundDecorations();
+
+        ClearDisplayAllPlantedCrops();
     }
 
     public void DisplayDugGround(GridPropertyDetails gridPropertyDetails)
@@ -109,15 +125,78 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
     private void DisplayGridPropertyDetails()
     {
-        // Loop through all grid items
+        
         foreach (KeyValuePair<string, GridPropertyDetails> item in gridPropertyDictionary)
         {
             GridPropertyDetails gridPropertyDetails = item.Value;
 
             DisplayDugGround(gridPropertyDetails);
+            DisplayWateredGround(gridPropertyDetails);
+            DisplayPlantedCrop(gridPropertyDetails);
         }
     }
+    /// <summary>
+    /// Returns Crop Details for the provided seedItemCode
+    /// </summary>
+    public CropDetails GetCropDetails(int seedItemCode)
+    {
+        return so_CropDetailsList.GetCropDetails(seedItemCode);
+    }
+    /// <summary>
+    /// 显示种植的作物
+    /// </summary>
+    public void DisplayPlantedCrop(GridPropertyDetails gridPropertyDetails)
+    {
+        // 如果有种子的物品代码
+        if (gridPropertyDetails.seedItemCode > -1)
+        {
+            // 获取作物详情
+            CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
 
+            if (cropDetails != null)
+            {
+                // 要使用的预制体
+                GameObject cropPrefab;
+
+                // 在网格位置实例化作物预制体
+                int growthStages = cropDetails.growthDays.Length;
+
+                int currentGrowthStage = 0;
+
+                // 根据生长天数确定当前生长阶段
+                for (int i = growthStages - 1; i >= 0; i--)
+                {
+                    if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
+                    {
+                        currentGrowthStage = i;
+                        Debug.Log("Current growth stage: " + currentGrowthStage);
+                        break;
+                    }
+                }
+
+                cropPrefab = cropDetails.growthPrefab[currentGrowthStage];
+
+                Sprite growthSprite = cropDetails.growthSprite[currentGrowthStage];
+
+                // 将网格位置转换为世界坐标
+                Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+                worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+
+                // 实例化作物预制体
+                GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
+
+                // 设置作物的生长精灵
+                cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
+
+                // 设置作物的父物体
+                cropInstance.transform.SetParent(cropParentTransform);
+
+                // 设置作物的网格位置
+                cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+            }
+        }
+    }
 
 
     /// <summary>
@@ -194,10 +273,20 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
     private void AfterSceneLoaded()
     {
+        // 获取作物父物体transform
+        if (GameObject.FindGameObjectWithTag(Tags.CropsParentTransform) != null)
+        {
+            cropParentTransform = GameObject.FindGameObjectWithTag(Tags.CropsParentTransform).transform;
+        }
+        else
+        {
+            cropParentTransform= null;
+        }
+
         // 获取网格对象
         grid = GameObject.FindObjectOfType<Grid>();
 
-        // Get tilemaps
+        // 获取地面装饰1和2的Tilemap
         groundDecoration1 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration1).GetComponent<Tilemap>();
         groundDecoration2 = GameObject.FindGameObjectWithTag(Tags.GroundDecoration2).GetComponent<Tilemap>();
 
@@ -352,7 +441,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
                         // 更新所有网格属性以反映天数的增加
                         // 如果一个作物被种植
                         if (gridPropertyDetails.growthDays > -1)
-                        {
+                        {   
                             gridPropertyDetails.growthDays += 1;
                         }
 
