@@ -10,6 +10,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     private Transform cropParentTransform;// 作物父物体
     private Tilemap groundDecoration1;// 地面装饰1
     private Tilemap groundDecoration2;// 地面装饰2
+    private bool isFirstTimeSceneLoaded = true; // 是否第一次加载场景
     private Grid grid; // 网格对象
     private Dictionary<string, GridPropertyDetails> gridPropertyDictionary; // 网格属性字典
     [SerializeField] private SO_CropDetailsList so_CropDetailsList = null;// 作物详情列表
@@ -265,6 +266,10 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
                 this.gridPropertyDictionary = gridPropertyDictionary;
             }
 
+            // 设置是否第一次加载场景
+            sceneSave.boolDictionary=new Dictionary<string, bool>();
+            sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", true);
+
             // 将场景保存数据添加到游戏对象的场景数据中
             GameObjectSave.sceneData.Add(so_GridProperties.sceneName.ToString(), sceneSave);
         }
@@ -354,42 +359,71 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
         SaveLoadManager.Instance.iSaveableObjectList.Add(this);
     }
 
+    /// <summary>
+    /// 恢复场景，加载指定场景的保存数据。
+    /// </summary>
+    /// <param name="sceneName">要恢复的场景名称。</param>
     public void ISaveableRestoreScene(string sceneName)
     {
-        // Get sceneSave for scene - it exists since we created it in initialise
+        // 获取指定场景的保存数据
         if (GameObjectSave.sceneData.TryGetValue(sceneName, out SceneSave sceneSave))
         {
-            // get grid property details dictionary - it exists since we created it in initialise
+            // 如果存在网格属性详情字典，则恢复网格属性详情字典
             if (sceneSave.gridPropertyDetailsDictionary != null)
             {
                 gridPropertyDictionary = sceneSave.gridPropertyDetailsDictionary;
             }
-            // If grid properties exist
+
+            // 如果存在bool字典，并且存在键为"isFirstTimeSceneLoaded"的值，则恢复isFirstTimeSceneLoaded变量
+            if (sceneSave.boolDictionary != null && sceneSave.boolDictionary.TryGetValue("isFirstTimeSceneLoaded", out bool storedIsFirstTimeSceneLoaded))
+            {
+                isFirstTimeSceneLoaded = storedIsFirstTimeSceneLoaded;
+            }
+
+            // 如果是第一次加载该场景，则实例化场景中的作物预制体
+            if (isFirstTimeSceneLoaded)
+            {
+                EventHandler.CallInstantiateCropPrefabsEvent();
+            }
+
+            // 检查网格属性是否存在
             if (gridPropertyDictionary.Count > 0)
             {
-                // grid property details found for the current scene destroy existing ground decoration
+                // 清除当前场景的地面装饰
                 ClearDisplayGridPropertyDetails();
 
-                // Instantiate grid property details for current scene
+                // 实例化当前场景的网格属性详情
                 DisplayGridPropertyDetails();
             }
 
-
+            // 更新isFirstTimeSceneLoaded变量
+            if (isFirstTimeSceneLoaded)
+            {
+                isFirstTimeSceneLoaded = false;
+            }
         }
     }
 
+    /// <summary>
+    /// 存储场景，保存指定场景的数据。
+    /// </summary>
+    /// <param name="sceneName">要存储的场景名称。</param>
     public void ISaveableStoreScene(string sceneName)
     {
-        // Remove sceneSave for scene
+        // 移除指定场景的保存数据
         GameObjectSave.sceneData.Remove(sceneName);
 
-        // Create sceneSave for scene
+        // 创建场景保存数据对象
         SceneSave sceneSave = new SceneSave();
 
-        // create & add dict grid property details dictionary
+        // 创建并添加网格属性详情字典
         sceneSave.gridPropertyDetailsDictionary = gridPropertyDictionary;
 
-        // Add scene save to game object scene data
+        // 创建并添加bool字典，用于记录是否是第一次加载场景
+        sceneSave.boolDictionary = new Dictionary<string, bool>();
+        sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", isFirstTimeSceneLoaded);
+
+        // 将场景保存数据添加到游戏对象的场景数据中
         GameObjectSave.sceneData.Add(sceneName, sceneSave);
     }
 
