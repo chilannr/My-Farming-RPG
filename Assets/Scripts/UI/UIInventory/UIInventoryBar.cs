@@ -180,7 +180,7 @@ public class UIInventoryBar : MonoBehaviour
     {
         for (int i = 0; i < inventorySlot.Length; i++)
         {
-            //inventorySlot[i].ClearSelectedItem();
+            inventorySlot[i].ClearSelectedItem();
         }
     }
 }

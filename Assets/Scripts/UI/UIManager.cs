@@ -6,8 +6,8 @@ public class UIManager : SingletonMonobehaviour<UIManager>
     // 暂停菜单是否打开
     private bool _pauseMenuOn = false;
 
-    //[SerializeField] private UIInventoryBar uiInventoryBar = null;
-    //[SerializeField] private PauseMenuInventoryManagement pauseMenuInventoryManagement = null;
+    [SerializeField] private UIInventoryBar uiInventoryBar = null;
+    [SerializeField] private PauseMenuInventoryManagement pauseMenuInventoryManagement = null;
     [SerializeField] private GameObject pauseMenu = null;
     [SerializeField] private GameObject[] menuTabs = null;
     [SerializeField] private Button[] menuButtons = null;
@@ -44,8 +44,8 @@ public class UIManager : SingletonMonobehaviour<UIManager>
 
     private void EnablePauseMenu()
     {
-        //uiInventoryBar.DestroyCurrentlyDraggedItems();
-        //uiInventoryBar.ClearCurrentlySelectedItems();
+        uiInventoryBar.DestroyCurrentlyDraggedItems();
+        uiInventoryBar.ClearCurrentlySelectedItems();
 
         PauseMenuOn = true;
         Player.Instance.PlayerInputIsDisabled = true;
@@ -59,7 +59,7 @@ public class UIManager : SingletonMonobehaviour<UIManager>
 
     public void DisablePauseMenu()
     {
-        //pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
+        pauseMenuInventoryManagement.DestroyCurrentlyDraggedItems();
 
         PauseMenuOn = false;
         Player.Instance.PlayerInputIsDisabled = false;
