@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventoryManager : SingletonMonobehaviour<InventoryManager>
+public class InventoryManager : SingletonMonobehaviour<InventoryManager>,ISaveable
 {
+    private UIInventoryBar inventoryBar; // UI的物品栏
     private Dictionary<int, ItemDetails> itemDetilsDictionary; // 物品详情字典，用于存储物品的详细信息
 
     public List<InventoryItem>[] inventoryLists; // 物品清单列表数组，用于存储不同位置的物品清单
@@ -12,6 +13,12 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
     [HideInInspector] public int[] inventoryListCapacityIntArray; // 物品清单容量数组，用于存储不同位置的物品清单容量
 
     [SerializeField] private SO_ItemList itemList = null; // 物品列表的ScriptableObject
+
+    private string _iSaveableUniqueID;// 保存数据的唯一ID
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    private GameObjectSave _gameObjectSave; // 保存数据的对象
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
 
     protected override void Awake()
     {
@@ -32,9 +39,22 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         }
 
         // 获取游戏对象的唯一ID并创建保存数据对象
-        //ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
 
-        //GameObjectSave = new GameObjectSave();
+        GameObjectSave = new GameObjectSave();
+    }
+
+    private void OnEnable()
+    {
+        ISaveableRegister();
+    }
+    private void OnDisable()
+    {
+        ISaveableDeregister();
+    }
+    private void Start()
+    {
+        inventoryBar= FindObjectOfType<UIInventoryBar>();
     }
 
     private void CreateInventoryLists()
@@ -238,6 +258,85 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>
         }
 
         return itemTypeDescription;
+    }
+
+    public void ISaveableRegister()
+    {
+        // 将当前对象添加到游戏保存管理器的可保存对象列表中
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+    public void ISaveableDeregister()
+    {
+        // 从游戏保存管理器的可保存对象列表中移除当前对象
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+    public GameObjectSave ISaveableSave()
+    {
+        // 创建新的场景保存对象
+        SceneSave sceneSave = new SceneSave();
+
+        // 移除该游戏对象在持久场景中已存在的任何保存数据
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // 将背包列表数组添加到持久场景保存数据中
+        sceneSave.listInvItemArray = inventoryLists;
+
+        // 将背包列表容量数组添加到持久场景保存数据中
+        sceneSave.intArrayDictionary = new Dictionary<string, int[]>();
+        sceneSave.intArrayDictionary.Add("inventoryListCapacityArray", inventoryListCapacityIntArray);
+
+        // 添加该游戏对象的场景保存数据
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        return GameObjectSave;
+    }
+
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // 尝试找到该游戏对象的持久场景保存数据
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // 如果存在背包列表数组数据,则加载
+                if (sceneSave.listInvItemArray != null)
+                {
+                    inventoryLists = sceneSave.listInvItemArray;
+
+                    // 触发背包更新事件
+                    for (int i = 0; i < (int)InventoryLocation.count; i++)
+                    {
+                        EventHandler.CallInventoryUpdatedEvent((InventoryLocation)i, inventoryLists[i]);
+                    }
+
+                    // 清除玩家当前携带的物品
+                    Player.Instance.ClearCarriedItem();
+
+                    // 清除背包栏高亮
+                    inventoryBar.ClearHighlightOnInventorySlots();
+                }
+
+                // 如果存在背包列表容量数组数据,则加载
+                if (sceneSave.intArrayDictionary != null && sceneSave.intArrayDictionary.TryGetValue("inventoryListCapacityArray", out int[] inventoryCapacityArray))
+                {
+                    inventoryListCapacityIntArray = inventoryCapacityArray;
+                }
+            }
+        }
+    }
+
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // 由于背包管理器位于持久场景中,因此无需任何操作
+    }
+
+    public void ISaveableRestoreScene(string sceneName)
+    {
+        // 由于背包管理器位于持久场景中,因此无需任何操作
     }
 
     /// <summary>

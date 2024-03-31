@@ -54,7 +54,7 @@ public class SaveLoadManager : SingletonMonobehaviour<SaveLoadManager>
         }
 
         // 禁用暂停菜单
-        // UIManager.Instance.DisablePauseMenu();
+         UIManager.Instance.DisablePauseMenu();
     }
 
     // 将数据保存到文件
@@ -80,7 +80,7 @@ public class SaveLoadManager : SingletonMonobehaviour<SaveLoadManager>
         file.Close();
 
         // 禁用暂停菜单
-        // UIManager.Instance.DisablePauseMenu();
+         UIManager.Instance.DisablePauseMenu();
     }
 
     // 存储当前场景数据

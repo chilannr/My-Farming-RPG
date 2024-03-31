@@ -1,4 +1,6 @@
 [System.Serializable]
+
+
 /// <summary>
 /// Serializable Vector3 class
 /// </summary>

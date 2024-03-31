@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
-
-public class Player : SingletonMonobehaviour<Player>
+using UnityEngine.SceneManagement;
+public class Player : SingletonMonobehaviour<Player>, ISaveable
 {
     // 等待动画暂停的时间
     private WaitForSeconds afterLiftToolAnimationPause;
@@ -86,7 +86,7 @@ public class Player : SingletonMonobehaviour<Player>
         characterAttributeCustomisationList = new List<CharacterAttribute>();
 
         // 获取游戏对象的唯一ID并创建保存数据对象
-        //ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
 
         GameObjectSave = new GameObjectSave();
 
@@ -96,7 +96,7 @@ public class Player : SingletonMonobehaviour<Player>
 
     private void OnDisable()
     {
-        //ISaveableDeregister();
+        ISaveableDeregister();
 
         EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
@@ -104,7 +104,7 @@ public class Player : SingletonMonobehaviour<Player>
 
     private void OnEnable()
     {
-        //ISaveableRegister();
+        ISaveableRegister();
 
         EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
@@ -941,8 +941,126 @@ public class Player : SingletonMonobehaviour<Player>
         }
     }
 
+    public void ISaveableRegister()
+    {
+        // 将当前对象添加到游戏保存管理器的可保存对象列表中
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
 
+    public void ISaveableDeregister()
+    {
+        // 从游戏保存管理器的可保存对象列表中移除当前对象
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
 
+    public GameObjectSave ISaveableSave()
+    {
+        // 如果已经存在该游戏对象的保存数据,则先删除
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // 创建一个新的场景保存数据
+        SceneSave sceneSave = new SceneSave();
+
+        // 创建一个新的Vector3字典,用于存储向量数据
+        sceneSave.vector3Dictionary = new Dictionary<string, Vector3Serializable>();
+
+        // 创建一个新的字符串字典,用于存储其他数据
+        sceneSave.stringDictionary = new Dictionary<string, string>();
+
+        // 将玩家当前位置添加到Vector3字典中
+        Vector3Serializable vector3Serializable = new Vector3Serializable(transform.position.x, transform.position.y, transform.position.z);
+        sceneSave.vector3Dictionary.Add("playerPosition", vector3Serializable);
+
+        // 将当前场景名称添加到字符串字典中
+        sceneSave.stringDictionary.Add("currentScene", SceneManager.GetActiveScene().name);
+
+        // 将玩家当前方向添加到字符串字典中
+        sceneSave.stringDictionary.Add("playerDirection", playerDirection.ToString());
+
+        // 将该场景的保存数据添加到游戏对象保存数据中
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        return GameObjectSave;
+    }
+
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        // 尝试获取该游戏对象的保存数据
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            // 尝试获取该场景的保存数据
+            if (gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // 获取玩家位置数据
+                if (sceneSave.vector3Dictionary != null && sceneSave.vector3Dictionary.TryGetValue("playerPosition", out Vector3Serializable playerPosition))
+                {
+                    transform.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+                }
+
+                // 获取字符串字典
+                if (sceneSave.stringDictionary != null)
+                {
+                    // 获取玩家场景数据
+                    if (sceneSave.stringDictionary.TryGetValue("currentScene", out string currentScene))
+                    {
+                        SceneControllerManager.Instance.FadeAndLoadScene(currentScene, transform.position);
+                    }
+
+                    // 获取玩家方向数据
+                    if (sceneSave.stringDictionary.TryGetValue("playerDirection", out string playerDir))
+                    {
+                        bool playerDirFound = Enum.TryParse<Direction>(playerDir, true, out Direction direction);
+
+                        if (playerDirFound)
+                        {
+                            playerDirection = direction;
+                            SetPlayerDirection(playerDirection);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void SetPlayerDirection(Direction playerDirection)
+    {
+        switch (playerDirection)
+        {
+            case Direction.up:
+                // set idle up trigger
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false);
+
+                break;
+
+            case Direction.down:
+                // set idle down trigger
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false);
+                break;
+
+            case Direction.left:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false);
+                break;
+
+            case Direction.right:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true);
+                break;
+
+            default:
+                // set idle down trigger
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false);
+
+                break;
+        }
+    }
+
+    public void ISaveableStoreScene(string sceneName)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void ISaveableRestoreScene(string sceneName)
+    {
+        //throw new NotImplementedException();
+    }
 }
 
 

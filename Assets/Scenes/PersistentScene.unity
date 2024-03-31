@@ -5281,6 +5281,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1191821244}
   - component: {fileID: 1191821243}
+  - component: {fileID: 1191821245}
   m_Layer: 0
   m_Name: TimeManager
   m_TagString: Untagged
@@ -5315,6 +5316,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1191821245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1191821242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1e757e4a18d404f89f1ad701cdb2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gUID: 291c5f90-0fc0-4834-9a1b-aa7f3116906a
 --- !u!1 &1244962975
 GameObject:
   m_ObjectHideFlags: 0
@@ -9063,6 +9077,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2058200638}
   - component: {fileID: 2058200637}
+  - component: {fileID: 2058200639}
   m_Layer: 0
   m_Name: InventoryManager
   m_TagString: Untagged
@@ -9099,6 +9114,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2058200639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058200636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1e757e4a18d404f89f1ad701cdb2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gUID: 08925ff6-a534-47c2-b2f5-7672e903cf5c
 --- !u!1001 &2083803042
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10408,6 +10436,7 @@ GameObject:
   - component: {fileID: 5849070000024557778}
   - component: {fileID: 5849070000024557779}
   - component: {fileID: 5849070000024557780}
+  - component: {fileID: 5849070000024557781}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -10640,6 +10669,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a53d2c23d58add242b3913f958eb22e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5849070000024557781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4779999386012893915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1e757e4a18d404f89f1ad701cdb2c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gUID: 1ff42c1a-3790-4ed8-8356-5301bd00a6d8
 --- !u!1 &6387294051040342935
 GameObject:
   m_ObjectHideFlags: 0
@@ -12079,8 +12121,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 1874852899}
+        m_TargetAssemblyTypeName: SaveLoadManager, Assembly-CSharp
         m_MethodName: LoadDataFromFile
         m_Mode: 1
         m_Arguments:
@@ -13179,8 +13221,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 1874852899}
+        m_TargetAssemblyTypeName: SaveLoadManager, Assembly-CSharp
         m_MethodName: SaveDataToFile
         m_Mode: 1
         m_Arguments:

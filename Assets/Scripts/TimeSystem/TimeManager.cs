@@ -26,13 +26,13 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
     {
         base.Awake();
 
-        //ISaveableUniqueID = GetComponent<GenerateGUID>().GUID; // 生成唯一标识
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID; // 生成唯一标识
         GameObjectSave = new GameObjectSave(); // 创建游戏对象的保存数据
     }
 
     private void OnEnable()
     {
-       // ISaveableRegister(); // 注册ISaveable接口
+        ISaveableRegister(); // 注册ISaveable接口
 
         EventHandler.BeforeSceneUnloadEvent += BeforeSceneUnloadFadeOut; // 订阅场景卸载前淡出事件
         EventHandler.AfterSceneLoadEvent += AfterSceneLoadFadeIn; // 订阅场景加载后淡入事件
@@ -40,7 +40,7 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 
     private void OnDisable()
     {
-        //ISaveableDeregister(); // 注销ISaveable接口
+        ISaveableDeregister(); // 注销ISaveable接口
 
         EventHandler.BeforeSceneUnloadEvent -= BeforeSceneUnloadFadeOut; // 取消订阅场景卸载前淡出事件
         EventHandler.AfterSceneLoadEvent -= AfterSceneLoadFadeIn; // 取消订阅场景加载后淡入事件
@@ -202,20 +202,22 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 
     public void ISaveableRegister()
     {
-        SaveLoadManager.Instance.iSaveableObjectList.Add(this); // 注册ISaveable接口
+        // 将当前对象添加到游戏保存管理器的可保存对象列表中
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
     }
 
     public void ISaveableDeregister()
     {
-        SaveLoadManager.Instance.iSaveableObjectList.Remove(this); // 注销ISaveable接口
+        // 从游戏保存管理器的可保存对象列表中移除当前对象
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
     }
 
     public GameObjectSave ISaveableSave()
     {
-        // 删除现有的场景保存数据
+        // 删除持久场景中已存在的场景保存数据(如果有)
         GameObjectSave.sceneData.Remove(Settings.PersistentScene);
 
-        // 创建新的场景保存数据
+        // 创建新的场景保存对象
         SceneSave sceneSave = new SceneSave();
 
         // 创建新的整数字典
@@ -224,18 +226,18 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
         // 创建新的字符串字典
         sceneSave.stringDictionary = new Dictionary<string, string>();
 
-        // 添加值到整数字典
+        // 将游戏年、日、时、分、秒添加到整数字典中
         sceneSave.intDictionary.Add("gameYear", gameYear);
         sceneSave.intDictionary.Add("gameDay", gameDay);
         sceneSave.intDictionary.Add("gameHour", gameHour);
         sceneSave.intDictionary.Add("gameMinute", gameMinute);
         sceneSave.intDictionary.Add("gameSecond", gameSecond);
 
-        // 添加值到字符串字典
+        // 将游戏星期和季节添加到字符串字典中
         sceneSave.stringDictionary.Add("gameDayOfWeek", gameDayOfWeek);
         sceneSave.stringDictionary.Add("gameSeason", gameSeason.ToString());
 
-        // 将场景保存添加到游戏对象的持久场景
+        // 将场景保存数据添加到游戏对象的持久场景保存中
         GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
 
         return GameObjectSave;
@@ -243,18 +245,18 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 
     public void ISaveableLoad(GameSave gameSave)
     {
-        // 从gameSave数据中获取保存的游戏对象
+        // 尝试从游戏保存数据中获取该游戏对象的保存数据
         if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
         {
             GameObjectSave = gameObjectSave;
 
-            // 获取游戏对象的保存场景数据
+            // 尝试从游戏对象保存数据中获取持久场景保存数据
             if (GameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
             {
-                // 如果整数和字符串字典都存在
+                // 如果存在整数字典和字符串字典
                 if (sceneSave.intDictionary != null && sceneSave.stringDictionary != null)
                 {
-                    // 填充保存的整数值
+                    // 从整数字典中获取并设置游戏年、日、时、分、秒
                     if (sceneSave.intDictionary.TryGetValue("gameYear", out int savedGameYear))
                         gameYear = savedGameYear;
 
@@ -270,7 +272,7 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
                     if (sceneSave.intDictionary.TryGetValue("gameSecond", out int savedGameSecond))
                         gameSecond = savedGameSecond;
 
-                    // 填充保存的字符串值
+                    // 从字符串字典中获取并设置游戏星期和季节
                     if (sceneSave.stringDictionary.TryGetValue("gameDayOfWeek", out string savedGameDayOfWeek))
                         gameDayOfWeek = savedGameDayOfWeek;
 
@@ -282,10 +284,10 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
                         }
                     }
 
-                    // 重置游戏滴答时间
+                    // 将游戏时间重置为0
                     gameTick = 0f;
 
-                    // 触发游戏分钟推进事件
+                    // 触发游戏分钟进度事件
                     EventHandler.CallAdvanceGameMinuteEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
 
                     // 刷新游戏时钟
@@ -296,11 +298,12 @@ public class TimeManager : SingletonMonobehaviour<TimeManager>, ISaveable
 
     public void ISaveableStoreScene(string sceneName)
     {
-        // 在这里不需要做任何操作，因为时间管理器运行在持久场景上
+        // 由于时间管理器运行在持久场景中,因此无需进行任何操作
     }
 
     public void ISaveableRestoreScene(string sceneName)
     {
-        // 在这里不需要做任何操作，因为时间管理器运行在持久场景上
+        // 由于时间管理器运行在持久场景中,因此无需进行任何操作
     }
+
 }

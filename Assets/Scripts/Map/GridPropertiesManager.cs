@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 // 该类用于管理网格属性
@@ -453,12 +454,21 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
 
     public GameObjectSave ISaveableSave()
     {
-        throw new System.NotImplementedException();
+        // 存储当前场景的网格属性详情
+        ISaveableStoreScene(SceneManager.GetActiveScene().name);
+
+        return GameObjectSave;
     }
 
     public void ISaveableLoad(GameSave gameSave)
     {
-        throw new System.NotImplementedException();
+        if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // 从当前场景恢复网格属性详情
+            ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+        }
     }
     /// <summary>
     /// 推进游戏中的一天。
