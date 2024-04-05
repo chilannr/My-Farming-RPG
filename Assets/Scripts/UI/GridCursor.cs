@@ -203,7 +203,7 @@ public class GridCursor : MonoBehaviour
 
                     // 获取光标位置上的物品列表
                     List<Item> itemList = new List<Item>();
-
+                    List<Crop> cropList = new List<Crop>();
                     HelperMethods.GetComponentsAtBoxLocation<Item>(out itemList, cursorWorldPosition, Settings.cursorSize, 0f);
 
                     #endregion 需要获取光标位置上的物品列表，以便检查是否可收割
@@ -219,7 +219,17 @@ public class GridCursor : MonoBehaviour
                             break;
                         }
                     }
-
+                    //检查网格上是否可收获有作物，不允许玩家在可收获的场景作物上挖掘
+                    if (gridPropertyDetails.seedItemCode != -1) 
+                    { 
+                        CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+                    if (cropDetails != null)
+                    {
+                        // 检查作物是否已经完全成长
+                        if (gridPropertyDetails.growthDays >= cropDetails.growthDays[cropDetails.growthDays.Length - 1])
+                            return false;
+                    }
+                    }
                     if (foundReapable)
                     {
                         return false;
