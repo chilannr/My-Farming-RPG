@@ -429,16 +429,18 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             EventHandler.CallRemoveSelectedItemFromInventoryEvent();
 
             // 播放种植声音
-            //AudioManager.Instance.PlaySound(SoundName.effectPlantingSound);
+            AudioManager.Instance.PlaySound(SoundName.effectPlantingSound);
         }
     }
     private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
+        AudioManager.Instance.PlaySound(SoundName.effectWateringCan);
         // Trigger animation
         StartCoroutine(WaterGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
     }
     private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
+        AudioManager.Instance.PlaySound(SoundName.effectAxe);
         // Trigger animation
         StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
     }
@@ -543,7 +545,11 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     }
    
 
-
+    /// <summary>
+    /// 收割杂草
+    /// </summary>
+    /// <param name="equippedItemDetails"></param>
+    /// <param name="playerDirection"></param>
     private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         if (Input.GetMouseButton(0)) // 如果按下鼠标左键
@@ -596,7 +602,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                         EventHandler.CallHarvestActionEffectEvent(effectPosition, HarvestActionEffect.reaping);
 
                         // 播放声音
-                        //AudioManager.Instance.PlaySound(SoundName.effectScythe);
+                        AudioManager.Instance.PlaySound(SoundName.effectScythe);
 
                         Destroy(itemArray[i].gameObject);
 
@@ -619,7 +625,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private void ChopInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         // 播放声音
-        //AudioManager.Instance.PlaySound(SoundName.effectAxe);
+        AudioManager.Instance.PlaySound(SoundName.effectAxe);
 
         // 触发动画
         StartCoroutine(ChopInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
@@ -655,7 +661,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private void CollectInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         // 播放声音
-        //AudioManager.Instance.PlaySound(SoundName.effectBasket);
+        AudioManager.Instance.PlaySound(SoundName.effectBasket);
 
         StartCoroutine(CollectInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }
@@ -685,7 +691,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private void BreakInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
         // 播放声音
-        //AudioManager.Instance.PlaySound(SoundName.effectPickaxe);
+        AudioManager.Instance.PlaySound(SoundName.effectPickaxe);
 
         StartCoroutine(BreakInPlayerDirectionRoutine(gridPropertyDetails, equippedItemDetails, playerDirection));
     }

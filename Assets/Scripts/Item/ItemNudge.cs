@@ -25,10 +25,10 @@ public class ItemNudge : MonoBehaviour
             }
 
             // 如果碰撞对象的标签是"Player"，则播放rustle声音
-            //if (collision.gameObject.tag == "Player")
-            //{
-            //    AudioManager.Instance.PlaySound(SoundName.effectRustle);
-            //}
+            if (collision.gameObject.tag == "Player")
+            {
+                AudioManager.Instance.PlaySound(SoundName.effectRustle);
+            }
         }
     }
 
@@ -46,10 +46,10 @@ public class ItemNudge : MonoBehaviour
             }
 
             // 如果碰撞对象的标签是"Player"，则播放rustle声音
-            //if (collision.gameObject.tag == "Player")
-            //{
-            //    AudioManager.Instance.PlaySound(SoundName.effectRustle);
-            //}
+            if (collision.gameObject.tag == "Player")
+            {
+                AudioManager.Instance.PlaySound(SoundName.effectRustle);
+            }
         }
     }
 

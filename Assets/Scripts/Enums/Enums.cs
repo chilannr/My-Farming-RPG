@@ -145,29 +145,30 @@ public enum Direction
     none
 }
 
+// 定义声音名称的枚举类型
 public enum SoundName
 {
-    none = 0,
-    effectFootstepSoftGround = 10,
-    effectFootstepHardGround = 20,
-    effectAxe = 30,
-    effectPickaxe = 40,
-    effectScythe = 50,
-    effectHoe = 60,
-    effectWateringCan = 70,
-    effectBasket = 80,
-    effectPickupSound = 90,
-    effectRustle = 100,
-    effectTreeFalling = 110,
-    effectPlantingSound = 120,
-    effectPluck = 130,
-    effectStoneShatter = 140,
-    effectWoodSplinters = 150,
-    ambientCountryside1 = 1000,
-    ambientCountryside2 = 1010,
-    ambientIndoors1 = 1020,
-    musicCalm3 = 2000,
-    musicCalm1 = 2010
+    none = 0,                       // 无声音
+    effectFootstepSoftGround = 10,  // 轻脚步声
+    effectFootstepHardGround = 20,  // 重脚步声
+    effectAxe = 30,                 // 斧头声音
+    effectPickaxe = 40,             // 镐声音
+    effectScythe = 50,              // 镰刀声音
+    effectHoe = 60,                 // 锄头声音
+    effectWateringCan = 70,         // 浇水罐声音
+    effectBasket = 80,              // 篮子声音
+    effectPickupSound = 90,         // 捡起声音
+    effectRustle = 100,             // 摩擦声音
+    effectTreeFalling = 110,        // 树木倒下声音
+    effectPlantingSound = 120,      // 种植声音
+    effectPluck = 130,              // 拔取声音
+    effectStoneShatter = 140,       // 石头碎裂声音
+    effectWoodSplinters = 150,      // 木头碎裂声音
+    ambientCountryside1 = 1000,     // 乡村环境音1
+    ambientCountryside2 = 1010,     // 乡村环境音2
+    ambientIndoors1 = 1020,         // 室内环境音1
+    musicCalm3 = 2000,              // 平静音乐3
+    musicCalm1 = 2010               // 平静音乐1
 }
 
 

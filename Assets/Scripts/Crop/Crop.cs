@@ -98,7 +98,7 @@ public class Crop : MonoBehaviour
         // 是否有收获音效
         if (cropDetails.harvestSound != SoundName.none)
         {
-            //AudioManager.Instance.PlaySound(cropDetails.harvestSound);
+            AudioManager.Instance.PlaySound(cropDetails.harvestSound);
         }
 
 

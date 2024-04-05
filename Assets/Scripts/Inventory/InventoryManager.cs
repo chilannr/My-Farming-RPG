@@ -202,7 +202,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>,ISaveab
         inventoryItem.itemCode = itemCode;
         inventoryList[position] = inventoryItem;
 
-        DebugPrintInventoryList(inventoryList);
+        //DebugPrintInventoryList(inventoryList);
     }
 
     /// <summary>
@@ -216,7 +216,7 @@ public class InventoryManager : SingletonMonobehaviour<InventoryManager>,ISaveab
         inventoryItem.itemQuantity = 1;
         inventoryList.Add(inventoryItem);
 
-        DebugPrintInventoryList(inventoryList);
+        //DebugPrintInventoryList(inventoryList);
     }
     
 
