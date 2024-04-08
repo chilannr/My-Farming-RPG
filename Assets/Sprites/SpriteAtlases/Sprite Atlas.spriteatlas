@@ -820,6 +820,7 @@ SpriteAtlas:
     - b2eff0cde9f776947b747c1a4cc96406: 21300000
     - d1488fdd7509cda4f9b89da8bb3c5a68: 21300000
     - ffd3a07e9702a614284d1e5a4be9f532: 21300000
+    - 6b7445ae64b4bd040b0f38ba86c81f99: 21300000
     - afba78ae84664a941a55c31758ab5cf9: 1814301352343478109
     - afba78ae84664a941a55c31758ab5cf9: -7429651265933631045
     - afba78ae84664a941a55c31758ab5cf9: -8886988063636193416
@@ -892,6 +893,7 @@ SpriteAtlas:
     - b793cccf0b10a2148b7c8e09c08ac094: 5588880199808461859
     - b793cccf0b10a2148b7c8e09c08ac094: -8482852301027147495
     - b793cccf0b10a2148b7c8e09c08ac094: 7303584569058495136
+    - 3d896dcfa008e9c4792e7f3085a611c9: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: f0d720006ae6c9e468cc99a9f1713ba1, type: 3}
@@ -1655,6 +1657,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: b2eff0cde9f776947b747c1a4cc96406, type: 3}
   - {fileID: 21300000, guid: d1488fdd7509cda4f9b89da8bb3c5a68, type: 3}
   - {fileID: 21300000, guid: ffd3a07e9702a614284d1e5a4be9f532, type: 3}
+  - {fileID: 21300000, guid: 6b7445ae64b4bd040b0f38ba86c81f99, type: 3}
   - {fileID: 1814301352343478109, guid: afba78ae84664a941a55c31758ab5cf9, type: 3}
   - {fileID: -7429651265933631045, guid: afba78ae84664a941a55c31758ab5cf9, type: 3}
   - {fileID: -8886988063636193416, guid: afba78ae84664a941a55c31758ab5cf9, type: 3}
@@ -1727,6 +1730,7 @@ SpriteAtlas:
   - {fileID: 5588880199808461859, guid: b793cccf0b10a2148b7c8e09c08ac094, type: 3}
   - {fileID: -8482852301027147495, guid: b793cccf0b10a2148b7c8e09c08ac094, type: 3}
   - {fileID: 7303584569058495136, guid: b793cccf0b10a2148b7c8e09c08ac094, type: 3}
+  - {fileID: 21300000, guid: 3d896dcfa008e9c4792e7f3085a611c9, type: 3}
   m_PackedSpriteNamesToIndex:
   - Pumpkin
   - Weed1
@@ -2489,6 +2493,7 @@ SpriteAtlas:
   - InventoryHighlight
   - PauseScreenSelectedTab
   - Stone2Seed
+  - Lamp
   - Butch_14
   - Butch_19
   - Butch_18
@@ -2561,6 +2566,7 @@ SpriteAtlas:
   - DugGround_0
   - DugGround_3
   - DugGround_2
+  - JackOLantern
   m_RenderDataMap: {}
   m_Tag: Sprite Atlas
   m_IsVariant: 0
