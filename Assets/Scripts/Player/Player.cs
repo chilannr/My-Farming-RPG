@@ -16,6 +16,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private GridCursor gridCursor;
     private Cursor cursor;
 
+
     // 移动参数
     private float xInput;
     private float yInput;
@@ -184,8 +185,12 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     }
     private void PlayerMovementInput()
     {
-        yInput = Input.GetAxisRaw("Vertical");
-        xInput = Input.GetAxisRaw("Horizontal");
+        // 获取虚拟摇杆的轴值
+        yInput = VirtualJoystick.GetAxis("Vertical");
+        xInput = VirtualJoystick.GetAxis("Horizontal");
+
+        //yInput = Input.GetAxisRaw("Vertical");
+        //xInput = Input.GetAxisRaw("Horizontal");
 
         if (yInput != 0 && xInput != 0)
         {
@@ -216,7 +221,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             else
             {
                 playerDirection = Direction.up;
-            }
+            };
         }
         else if (xInput == 0 && yInput == 0)
         {
@@ -227,8 +232,9 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     }
     private void PlayerWalkInput()
     {
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) || VirtualJoystick.IsRadiusBound())
         {
+            
             isRunning = false;
             isWalking = true;
             isIdle = false;
