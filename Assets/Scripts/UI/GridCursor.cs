@@ -8,11 +8,15 @@ public class GridCursor : MonoBehaviour
     private Grid grid; // 网格
     private Camera mainCamera; // 主摄像机
     [SerializeField] private Image cursorImage = null; // 光标图像
+    [SerializeField] private Image[] cursorImagePro = null; // 光标图像
+    [SerializeField] private Image[] cursorImageUltra = null; // 光标图像
     [SerializeField] private RectTransform cursorRectTransform = null; // 光标矩形变换
+    [SerializeField] private RectTransform cursorRectTransformPro = null; // 光标矩形变换
+    [SerializeField] private RectTransform cursorRectTransformUltra = null; // 光标矩形变换
     [SerializeField] private Sprite greenCursorSprite = null; // 绿色光标精灵
     [SerializeField] private Sprite redCursorSprite = null; // 红色光标精灵
     [SerializeField] private SO_CropDetailsList so_CropDetailsList = null; // 作物详细信息列表
-
+    private GridCursorState gridCursorState; // 网格光标状态
     private bool _cursorPositionIsValid = false;
     public bool CursorPositionIsValid { get => _cursorPositionIsValid; set => _cursorPositionIsValid = value; } // 光标位置是否有效
 
@@ -40,6 +44,7 @@ public class GridCursor : MonoBehaviour
     {
         mainCamera = Camera.main;
         canvas = GetComponentInParent<Canvas>();
+        gridCursorState=GridCursorState.normal;
     }
 
     // 每一帧调用一次
@@ -66,7 +71,8 @@ public class GridCursor : MonoBehaviour
 
             // 获取光标的矩形变换位置
             cursorRectTransform.position = GetRectTransformPositionForCursor(gridPosition);
-
+            cursorRectTransformPro.position = cursorRectTransform.position;
+            cursorRectTransformUltra.position = cursorRectTransform.position;
             return gridPosition;
         }
         else
@@ -82,15 +88,6 @@ public class GridCursor : MonoBehaviour
 
     private void SetCursorValidity(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
     {
-        SetCursorToValid();
-
-        // 检查物品使用半径是否有效
-        if (Mathf.Abs(cursorGridPosition.x - playerGridPosition.x) > ItemUseGridRadius
-            || Mathf.Abs(cursorGridPosition.y - playerGridPosition.y) > ItemUseGridRadius)
-        {
-            SetCursorToInvalid();
-            return;
-        }
 
         // 获取选择的物品详细信息
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
@@ -100,7 +97,29 @@ public class GridCursor : MonoBehaviour
             SetCursorToInvalid();
             return;
         }
+        switch (itemDetails.itemType)
+        {
+            case ItemType.Hoeing_tool_Pro:
+            case ItemType.Watering_tool_Pro:
+                gridCursorState = GridCursorState.pro;
+                break;
+            case ItemType.Hoeing_tool_Ultra:
+            case ItemType.Watering_tool_Ultra:
+                gridCursorState = GridCursorState.ultra;
+                break;
+            default:
+                gridCursorState = GridCursorState.normal;
+                break;
+        }
+        SetCursorToValid();
 
+        // 检查物品使用半径是否有效
+        if (Mathf.Abs(cursorGridPosition.x - playerGridPosition.x) > ItemUseGridRadius
+            || Mathf.Abs(cursorGridPosition.y - playerGridPosition.y) > ItemUseGridRadius)
+        {
+            SetCursorToInvalid();
+            return;
+        }
         // 获取光标位置的网格属性详细信息
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
 
@@ -127,18 +146,21 @@ public class GridCursor : MonoBehaviour
                     break;
 
                 case ItemType.Watering_tool:
+                case ItemType.Watering_tool_Pro:
+                case ItemType.Watering_tool_Ultra:
                 case ItemType.Breaking_tool:
                 case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
+                case ItemType.Hoeing_tool_Pro:
+                case ItemType.Hoeing_tool_Ultra:
                     if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
                         return;
                     }
                     break;
-
                 case ItemType.none:
                     break;
 
@@ -161,16 +183,55 @@ public class GridCursor : MonoBehaviour
     /// </summary>
     private void SetCursorToInvalid()
     {
-        cursorImage.sprite = redCursorSprite;
+        DisableCursor();
+        EnableCursor();
+        if (gridCursorState == GridCursorState.pro)
+        {
+            for (int i = 0; i < cursorImagePro.Length; i++)
+            {
+                cursorImagePro[i].sprite = redCursorSprite;
+            }
+        }
+        else if (gridCursorState == GridCursorState.ultra)
+        {
+            for (int i = 0; i < cursorImageUltra.Length; i++)
+            {
+                cursorImageUltra[i].sprite = redCursorSprite;
+            }
+        }
+        else
+        {
+            cursorImage.sprite = redCursorSprite;
+        }
         CursorPositionIsValid = false;
     }
-
     /// <summary>
     /// 设置光标为有效
     /// </summary>
     private void SetCursorToValid()
     {
-        cursorImage.sprite = greenCursorSprite;
+        DisableCursor();
+        
+        EnableCursor();
+        if (gridCursorState == GridCursorState.pro)
+        {
+            for (int i = 0; i < cursorImagePro.Length; i++)
+            {
+                cursorImagePro[i].sprite = greenCursorSprite;
+            }
+        }
+        else if (gridCursorState == GridCursorState.ultra)
+        {
+            for (int i = 0; i < cursorImageUltra.Length; i++)
+            {
+                cursorImageUltra[i].sprite = greenCursorSprite;
+            }
+        }
+        else
+        {
+            cursorImage.sprite = greenCursorSprite;
+        }
+        CursorPositionIsValid = false;
         CursorPositionIsValid = true;
     }
 
@@ -243,8 +304,109 @@ public class GridCursor : MonoBehaviour
                 {
                     return false;
                 }
+            case ItemType.Hoeing_tool_Pro:
+                if (gridPropertyDetails.isDiggable == true && gridPropertyDetails.daysSinceDug == -1)
+                {
+                    #region 需要获取光标位置上的物品列表，以便检查是否可收割
 
+                    // 获取光标的世界坐标
+                    Vector3 cursorWorldPosition = new Vector3(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+
+                    // 获取光标位置上的物品列表
+                    List<Item> itemList = new List<Item>();
+                    List<Crop> cropList = new List<Crop>();
+                    HelperMethods.GetComponentsAtBoxLocation<Item>(out itemList, cursorWorldPosition, Settings.cursorSizePro, 0f);
+
+                    #endregion 需要获取光标位置上的物品列表，以便检查是否可收割
+
+                    // 遍历找到的物品，检查是否可收割 - 不允许玩家在可收割的场景物品上挖掘
+                    bool foundReapable = false;
+
+                    foreach (Item item in itemList)
+                    {
+                        if (InventoryManager.Instance.GetItemDetails(item.ItemCode).itemType == ItemType.Reapable_scenary)
+                        {
+                            foundReapable = true;
+                            break;
+                        }
+                    }
+                    //检查网格上是否可收获有作物，不允许玩家在可收获的场景作物上挖掘
+                    if (gridPropertyDetails.seedItemCode != -1)
+                    {
+                        CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+                        if (cropDetails != null)
+                        {
+                            // 检查作物是否已经完全成长
+                            if (gridPropertyDetails.growthDays >= cropDetails.growthDays[cropDetails.growthDays.Length - 1])
+                                return false;
+                        }
+                    }
+                    if (foundReapable)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            case ItemType.Hoeing_tool_Ultra:
+                if (gridPropertyDetails.isDiggable == true && gridPropertyDetails.daysSinceDug == -1)
+                {
+                    #region 需要获取光标位置上的物品列表，以便检查是否可收割
+
+                    // 获取光标的世界坐标
+                    Vector3 cursorWorldPosition = new Vector3(GetWorldPositionForCursor().x + 0.5f, GetWorldPositionForCursor().y + 0.5f, 0f);
+
+                    // 获取光标位置上的物品列表
+                    List<Item> itemList = new List<Item>();
+                    List<Crop> cropList = new List<Crop>();
+                    HelperMethods.GetComponentsAtBoxLocation<Item>(out itemList, cursorWorldPosition, Settings.cursorSizeUltra, 0f);
+
+                    #endregion 需要获取光标位置上的物品列表，以便检查是否可收割
+
+                    // 遍历找到的物品，检查是否可收割 - 不允许玩家在可收割的场景物品上挖掘
+                    bool foundReapable = false;
+
+                    foreach (Item item in itemList)
+                    {
+                        if (InventoryManager.Instance.GetItemDetails(item.ItemCode).itemType == ItemType.Reapable_scenary)
+                        {
+                            foundReapable = true;
+                            break;
+                        }
+                    }
+                    //检查网格上是否可收获有作物，不允许玩家在可收获的场景作物上挖掘
+                    if (gridPropertyDetails.seedItemCode != -1)
+                    {
+                        CropDetails cropDetails = so_CropDetailsList.GetCropDetails(gridPropertyDetails.seedItemCode);
+                        if (cropDetails != null)
+                        {
+                            // 检查作物是否已经完全成长
+                            if (gridPropertyDetails.growthDays >= cropDetails.growthDays[cropDetails.growthDays.Length - 1])
+                                return false;
+                        }
+                    }
+                    if (foundReapable)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
             case ItemType.Watering_tool:
+            case ItemType.Watering_tool_Pro:
+            case ItemType.Watering_tool_Ultra:
                 if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1)
                 {
                     return true;
@@ -306,6 +468,14 @@ public class GridCursor : MonoBehaviour
 
     public void DisableCursor()
     {
+        for (int i = 0; i < cursorImagePro.Length; i++)
+        {
+            cursorImagePro[i].color = Color.clear;
+        }
+        for (int i = 0; i < cursorImageUltra.Length; i++)
+        {
+            cursorImageUltra[i].color = Color.clear;
+        }
         cursorImage.color = Color.clear;
 
         CursorIsEnabled = false;
@@ -313,7 +483,25 @@ public class GridCursor : MonoBehaviour
 
     public void EnableCursor()
     {
-        cursorImage.color = new Color(1f, 1f, 1f, 1f);
+        if (gridCursorState == GridCursorState.pro)
+        {
+            for (int i = 0; i < cursorImagePro.Length; i++)
+            {
+                cursorImagePro[i].color = Color.white;
+            }
+        }
+        else if (gridCursorState == GridCursorState.ultra)
+        {
+            for (int i = 0; i < cursorImageUltra.Length; i++)
+            {
+                cursorImageUltra[i].color = Color.white;
+            }
+        }
+        else
+        {
+            cursorImage.color = Color.white;
+        }
+
         CursorIsEnabled = true;
     }
     public Vector3 GetWorldPositionForCursor()
@@ -338,4 +526,10 @@ public class GridCursor : MonoBehaviour
         return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, cursorRectTransform, canvas);
     }
 
+    enum GridCursorState
+    {
+        normal,
+        pro,
+        ultra
+    }
 }

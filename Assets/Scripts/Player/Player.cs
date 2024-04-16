@@ -185,13 +185,15 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     }
     private void PlayerMovementInput()
     {
+       
         // 获取虚拟摇杆的轴值
         yInput = VirtualJoystick.GetAxis("Vertical");
         xInput = VirtualJoystick.GetAxis("Horizontal");
-
-        //yInput = Input.GetAxisRaw("Vertical");
-        //xInput = Input.GetAxisRaw("Horizontal");
-
+        if (!Application.isMobilePlatform)
+        {
+            yInput = Input.GetAxisRaw("Vertical");
+            xInput = Input.GetAxisRaw("Horizontal");
+        }
         if (yInput != 0 && xInput != 0)
         {
             xInput = xInput * 0.71f;
@@ -281,7 +283,19 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
 
         // 获取光标位置的网格属性详情（GridCursor验证例程确保网格属性详情不为null）
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
-
+        GridPropertyDetails[] gridPropertyDetailsPro = new GridPropertyDetails[9]; 
+        for (int i = 0; i < 3; i++)
+        {
+            gridPropertyDetailsPro[i]  = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, (cursorGridPosition.y)-i);
+        }
+        for (int j = 0; j < 3; j++)
+        {
+            gridPropertyDetailsPro[3+j] = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x - 1, (cursorGridPosition.y)-j);
+        }
+        for (int k = 0; k < 3; k++)
+        {
+            gridPropertyDetailsPro[6 + k] = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x + 1, (cursorGridPosition.y)-k);
+        }
         // 获取所选物品的详情
         ItemDetails itemDetails = InventoryManager.Instance.GetSelectedInventoryItemDetails(InventoryLocation.player);
 
@@ -304,12 +318,16 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                     break;
 
                 case ItemType.Watering_tool:
+                case ItemType.Watering_tool_Pro:
+                case ItemType.Watering_tool_Ultra:
                 case ItemType.Breaking_tool:
                 case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
                 case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
-                    ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
+                case ItemType.Hoeing_tool_Pro:
+                case ItemType.Hoeing_tool_Ultra:
+                    ProcessPlayerClickInputTool(gridPropertyDetailsPro, itemDetails, playerDirection);
                     break;
 
                 case ItemType.none:
@@ -367,7 +385,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     /// <param name="gridPropertyDetails">网格属性详情</param>
     /// <param name="itemDetails">物品详情</param>
     /// <param name="playerDirection">玩家方向</param>
-    private void ProcessPlayerClickInputTool(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    private void ProcessPlayerClickInputTool(GridPropertyDetails[] gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
     {
         // 根据工具类型进行操作
         switch (itemDetails.itemType)
@@ -375,35 +393,58 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             case ItemType.Hoeing_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    HoeGroundAtCursor(gridPropertyDetails, playerDirection);
+                    HoeGroundAtCursor(gridPropertyDetails, playerDirection,1);
                 }
                 break;
-
+            case ItemType.Hoeing_tool_Pro:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    HoeGroundAtCursor(gridPropertyDetails, playerDirection,3);
+             
+                }
+                break;
+            case ItemType.Hoeing_tool_Ultra:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    HoeGroundAtCursor(gridPropertyDetails, playerDirection, 9);
+                }
+                break;
             case ItemType.Watering_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    WaterGroundAtCursor(gridPropertyDetails, playerDirection);
+                    WaterGroundAtCursor(gridPropertyDetails, playerDirection,1);
                 }
                 break;
-
+            case ItemType.Watering_tool_Pro:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    WaterGroundAtCursor(gridPropertyDetails, playerDirection,3);
+                }
+                break;
+            case ItemType.Watering_tool_Ultra:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    WaterGroundAtCursor(gridPropertyDetails, playerDirection, 9);
+                }
+                break;
             case ItemType.Chopping_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    ChopInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                    ChopInPlayerDirection(gridPropertyDetails[0], itemDetails, playerDirection);
                 }
                 break;
 
             case ItemType.Collecting_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                    CollectInPlayerDirection(gridPropertyDetails[0], itemDetails, playerDirection);
                 }
                 break;
 
             case ItemType.Breaking_tool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    BreakInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                    BreakInPlayerDirection(gridPropertyDetails[0], itemDetails, playerDirection);
                 }
                 break;
 
@@ -438,19 +479,19 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             AudioManager.Instance.PlaySound(SoundName.effectPlantingSound);
         }
     }
-    private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+    private void WaterGroundAtCursor(GridPropertyDetails[] gridPropertyDetails, Vector3Int playerDirection, int gridNumber)
     {
         AudioManager.Instance.PlaySound(SoundName.effectWateringCan);
         // Trigger animation
-        StartCoroutine(WaterGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
+        StartCoroutine(WaterGroundAtCursorRoutine(playerDirection, gridPropertyDetails,gridNumber));
     }
-    private void HoeGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
+    private void HoeGroundAtCursor(GridPropertyDetails[] gridPropertyDetails, Vector3Int playerDirection,int gridNumber)
     {
         AudioManager.Instance.PlaySound(SoundName.effectAxe);
         // Trigger animation
-        StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails));
+        StartCoroutine(HoeGroundAtCursorRoutine(playerDirection, gridPropertyDetails,gridNumber));
     }
-    private IEnumerator WaterGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
+    private IEnumerator WaterGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails[] gridPropertyDetails, int gridNumber)
     {
         PlayerInputIsDisabled = true;
         playerToolUseDisabled = true;
@@ -482,18 +523,19 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         }
 
         yield return liftToolAnimationPause;
-
-        // Set Grid property details for watered ground
-        if (gridPropertyDetails.daysSinceWatered == -1)
+        for (int i = 0; i < gridNumber; i++)
         {
-            gridPropertyDetails.daysSinceWatered = 0;
+            // Set Grid property details for watered ground
+            if (gridPropertyDetails[i].daysSinceWatered == -1)
+            {
+                gridPropertyDetails[i].daysSinceWatered = 0;
+            }
+
+            // Set grid property to watered
+            GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails[i].gridX, gridPropertyDetails[i].gridY, gridPropertyDetails[i]);
+            //Display watered grid tiles
+            GridPropertiesManager.Instance.DisplayWateredGround(gridPropertyDetails[i]);
         }
-
-        // Set grid property to watered
-        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
-        //Display watered grid tiles
-        GridPropertiesManager.Instance.DisplayWateredGround(gridPropertyDetails);
-
         // After animation pause
         yield return afterLiftToolAnimationPause;
 
@@ -501,7 +543,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         playerToolUseDisabled = false;
     }
 
-    private IEnumerator HoeGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails gridPropertyDetails)
+    private IEnumerator HoeGroundAtCursorRoutine(Vector3Int playerDirection, GridPropertyDetails[] gridPropertyDetails,int gridNumber)
     {
         PlayerInputIsDisabled = true;
         playerToolUseDisabled = true;
@@ -530,18 +572,21 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         }
 
         yield return useToolAnimationPause;
+        for (int i = 0; i < gridNumber; i++)
+          {
+                // Set Grid property details for dug ground
+                if (gridPropertyDetails[i].daysSinceDug == -1)
+                {
+                    gridPropertyDetails[i].daysSinceDug = 0;
+                }
 
-        // Set Grid property details for dug ground
-        if (gridPropertyDetails.daysSinceDug == -1)
-        {
-            gridPropertyDetails.daysSinceDug = 0;
-        }
+                // Set grid property to dug
+                GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails[i].gridX, gridPropertyDetails[i].gridY, gridPropertyDetails[i]);
 
-        // Set grid property to dug
-        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
-
-        // Display dug grid tiles
-        GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails);
+                // Display dug grid tiles
+                GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails[i]);
+          }
+        
 
         // After animation pause
         yield return afterUseToolAnimationPause;

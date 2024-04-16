@@ -17,6 +17,8 @@ public static class Settings
     public const int maxGridWidth = 99999;
     public const int maxGridHeight = 99999;
     public static Vector2 cursorSize = Vector2.one;
+    public static Vector2 cursorSizePro =new Vector2(1,3);
+    public static Vector2 cursorSizeUltra =new Vector2(3,3);
 
     // Player
     public static float playerCentreYOffset = 0.875f;

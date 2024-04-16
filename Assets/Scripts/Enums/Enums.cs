@@ -200,6 +200,7 @@ public enum ItemType
     [System.ComponentModel.Description("浇水工具")]
     Watering_tool,      // 浇水工具
 
+
     [System.ComponentModel.Description("耕地工具")]
     Hoeing_tool,        // 耕地工具
 
@@ -217,6 +218,18 @@ public enum ItemType
 
     [System.ComponentModel.Description("可收获的场景物品")]
     Reapable_scenary,   // 可收获的场景物品
+
+    [System.ComponentModel.Description("耕地工具Pro")]
+    Hoeing_tool_Pro,        // 耕地工具Pro
+
+    [System.ComponentModel.Description("浇水工具Pro")]
+    Watering_tool_Pro,      // 浇水工具Pro
+
+    [System.ComponentModel.Description("耕地工具Ultra")]
+    Hoeing_tool_Ultra,        // 耕地工具Ultra
+
+    [System.ComponentModel.Description("浇水工具Ultra")]
+    Watering_tool_Ultra,      // 浇水工具Ultra
 
     [System.ComponentModel.Description("无类型")]
     none,               // 无类型

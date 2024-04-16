@@ -45,7 +45,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         mainCamera = Camera.main;
         gridCursor = FindObjectOfType<GridCursor>();
-        cursor= FindObjectOfType<Cursor>();
+        cursor = FindObjectOfType<Cursor>();
     }
     private void ClearCursors()
     {
@@ -193,11 +193,11 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // If item requires a grid cursor then enable cursor
         if (itemDetails.itemUseGridRadius > 0)
         {
-            gridCursor.EnableCursor();
+                gridCursor.EnableCursor();
         }
         else
         {
-            gridCursor.DisableCursor();
+                gridCursor.DisableCursor();
         }
         if (itemDetails.itemUseRadius > 0f)
         {

@@ -301,3 +301,51 @@ MonoBehaviour:
     canBeDropped: 0
     canBeEaten: 0
     canBeCarried: 0
+  - itemCode: 10024
+    itemType: 9
+    itemDescription: A Better Hoe
+    itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
+    itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
+    itemUseGridRadius: 1
+    itemUseRadius: 0
+    isStartingItem: 1
+    canBePickedUp: 1
+    canBeDropped: 0
+    canBeEaten: 0
+    canBeCarried: 0
+  - itemCode: 10025
+    itemType: 11
+    itemDescription: A Best Hoe
+    itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
+    itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
+    itemUseGridRadius: 1
+    itemUseRadius: 0
+    isStartingItem: 1
+    canBePickedUp: 1
+    canBeDropped: 0
+    canBeEaten: 0
+    canBeCarried: 0
+  - itemCode: 10026
+    itemType: 10
+    itemDescription: A Better Watering Can
+    itemSprite: {fileID: 21300136, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
+    itemLongDescription: "\u6C34 \u662F\u4E07\u7269\u4E4B\u6E90\u3002"
+    itemUseGridRadius: 1
+    itemUseRadius: 0
+    isStartingItem: 1
+    canBePickedUp: 1
+    canBeDropped: 0
+    canBeEaten: 0
+    canBeCarried: 0
+  - itemCode: 10027
+    itemType: 12
+    itemDescription: A Best Watering Can
+    itemSprite: {fileID: 21300136, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
+    itemLongDescription: "\u6C34 \u662F\u4E07\u7269\u4E4B\u6E90\u3002"
+    itemUseGridRadius: 1
+    itemUseRadius: 0
+    isStartingItem: 1
+    canBePickedUp: 1
+    canBeDropped: 0
+    canBeEaten: 0
+    canBeCarried: 0
