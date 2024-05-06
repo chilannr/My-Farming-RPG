@@ -189,7 +189,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         // 获取虚拟摇杆的轴值
         yInput = VirtualJoystick.GetAxis("Vertical");
         xInput = VirtualJoystick.GetAxis("Horizontal");
-        if (!Application.isMobilePlatform)
+        if (xInput == 0 && yInput == 0)
         {
             yInput = Input.GetAxisRaw("Vertical");
             xInput = Input.GetAxisRaw("Horizontal");
