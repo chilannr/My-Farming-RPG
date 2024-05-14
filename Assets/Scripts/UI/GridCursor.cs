@@ -70,7 +70,8 @@ public class GridCursor : MonoBehaviour
             SetCursorValidity(gridPosition, playerGridPosition);
 
             // 获取光标的矩形变换位置
-            cursorRectTransform.position = GetRectTransformPositionForCursor(gridPosition);
+            //cursorRectTransform.position = GetRectTransformPositionForCursor(gridPosition);
+            cursorRectTransform.position = GetRectTransformPlayerPositionForCursor();
             cursorRectTransformPro.position = cursorRectTransform.position;
             cursorRectTransformUltra.position = cursorRectTransform.position;
             return gridPosition;
@@ -111,6 +112,8 @@ public class GridCursor : MonoBehaviour
                 gridCursorState = GridCursorState.normal;
                 break;
         }
+
+
         SetCursorToValid();
 
         // 检查物品使用半径是否有效
@@ -151,7 +154,6 @@ public class GridCursor : MonoBehaviour
                 case ItemType.Breaking_tool:
                 case ItemType.Chopping_tool:
                 case ItemType.Hoeing_tool:
-                case ItemType.Reaping_tool:
                 case ItemType.Collecting_tool:
                 case ItemType.Hoeing_tool_Pro:
                 case ItemType.Hoeing_tool_Ultra:
@@ -452,7 +454,6 @@ public class GridCursor : MonoBehaviour
                 }
 
                 return false;
-
             default:
                 return false;
         }
@@ -511,12 +512,17 @@ public class GridCursor : MonoBehaviour
     public Vector3Int GetGridPositionForCursor()
     {
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));  // z是相对于摄像机的物体的远近距离 - 摄像机在-10,所以物体在(-)-10前面 = 10
-        return grid.WorldToCell(worldPosition);
+        return GetGridPositionForPlayer();
+        //return grid.WorldToCell(worldPosition);
     }
 
     public Vector3Int GetGridPositionForPlayer()
     {
-        return grid.WorldToCell(Player.Instance.transform.position);
+        Direction playerDirection = Player.Instance.playerDirection;
+
+        Vector3Int vector3Int= Player.Instance.GetPlayerDirection(playerDirection);
+        Vector3 vector3= new Vector3(0.5f*vector3Int.x, 0.5f * vector3Int.y, 0f);
+        return grid.WorldToCell(Player.Instance.transform.position + vector3);
     }
 
     public Vector2 GetRectTransformPositionForCursor(Vector3Int gridPosition)
@@ -525,7 +531,12 @@ public class GridCursor : MonoBehaviour
         Vector2 gridScreenPosition = mainCamera.WorldToScreenPoint(gridWorldPosition);
         return RectTransformUtility.PixelAdjustPoint(gridScreenPosition, cursorRectTransform, canvas);
     }
+    public Vector2 GetRectTransformPlayerPositionForCursor()
+    {
 
+
+        return GetRectTransformPositionForCursor(GetGridPositionForPlayer());
+    }
     enum GridCursorState
     {
         normal,

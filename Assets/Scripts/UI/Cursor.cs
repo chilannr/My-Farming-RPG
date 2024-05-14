@@ -49,7 +49,7 @@ public class Cursor : MonoBehaviour
         SetCursorValidity(cursorWorldPosition, Player.Instance.GetPlayerCentrePosition());
 
         // 获取光标的矩形变换位置
-        cursorRectTransform.position = GetRectTransformPositionForCursor();
+        cursorRectTransform.position = gridCursor.GetRectTransformPlayerPositionForCursor(); ;
     }
 
     private void SetCursorValidity(Vector3 cursorPosition, Vector3 playerPosition)
@@ -69,7 +69,7 @@ public class Cursor : MonoBehaviour
             )
 
         {
-            SetCursorToInvalid();
+            //SetCursorToInvalid();
             return;
         }
 
@@ -77,7 +77,7 @@ public class Cursor : MonoBehaviour
         if (Mathf.Abs(cursorPosition.x - playerPosition.x) > ItemUseRadius
             || Mathf.Abs(cursorPosition.y - playerPosition.y) > ItemUseRadius)
         {
-            SetCursorToInvalid();
+            //SetCursorToInvalid();
             return;
         }
 
@@ -136,7 +136,7 @@ public class Cursor : MonoBehaviour
         cursorImage.sprite = transparentCursorSprite;
         CursorPositionIsValid = false;
 
-        gridCursor.EnableCursor();
+        //gridCursor.EnableCursor();
     }
 
     /// <summary>
@@ -194,12 +194,16 @@ public class Cursor : MonoBehaviour
 
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(screenPosition);
 
+        worldPosition = gridCursor.GetWorldPositionForCursor();
+
         return worldPosition;
     }
 
     public Vector2 GetRectTransformPositionForCursor()
     {
         Vector2 screenPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        return new Vector2(gridCursor.GetWorldPositionForCursor().x, gridCursor.GetWorldPositionForCursor().y);
 
         return RectTransformUtility.PixelAdjustPoint(screenPosition, cursorRectTransform, canvas);
     }

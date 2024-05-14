@@ -16,11 +16,12 @@ public class LightingControl : MonoBehaviour
     private float currentLightIntensity; // 当前光源的亮度值
     private float lightFlickerTimer = 0f; // 用于计时光源闪烁的间隔时间
     private Coroutine fadeInLightCoroutine; // 用于控制光源渐变变亮效果的协程
+    private Animator animator; // 用于控制光源的动画效果
 
     private void Awake()
     {
         light2D = GetComponentInChildren<Light2D>(); // 获取 Light2D 组件引用
-
+        animator = GetComponent<Animator>(); // 获取 Animator 组件
         if (light2D == null)
             enabled = false; // 如果没有 Light2D 组件,则禁用该脚本
 
@@ -96,6 +97,13 @@ public class LightingControl : MonoBehaviour
 
             if (lightingBrightnessDictionary.TryGetValue(key, out float targetLightingIntensity)) // 查找对应的亮度值
             {
+                if (animator != null)
+                {
+                    if (targetLightingIntensity != 0f)
+                        animator.SetBool("isNight", true);
+                    else
+                        animator.SetBool("isNight", false);
+                }
                 if (fadein)
                 {
                     if (fadeInLightCoroutine != null) StopCoroutine(fadeInLightCoroutine); // 如果有正在运行的渐变协程,则停止

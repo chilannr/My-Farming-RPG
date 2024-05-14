@@ -17,7 +17,7 @@ MonoBehaviour:
     itemType: 0
     itemDescription: Canyon Oak Acorn
     itemSprite: {fileID: 21300000, guid: 730e572c78cf0244ca0db36bb8f3af7f, type: 3}
-    itemLongDescription: "\u6A61\u6811\u79CD\u5B50\uFF0C\u4E00\u5929\u6210\u719F"
+    itemLongDescription: "\u6A61\u6811\u79CD\u5B50"
     itemUseGridRadius: 2
     itemUseRadius: 0
     isStartingItem: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
     itemType: 1
     itemDescription: Pumpkin
     itemSprite: {fileID: 21300000, guid: f0d720006ae6c9e468cc99a9f1713ba1, type: 3}
-    itemLongDescription: "\u975E\u5E38\u7F8E\u5473\uFF01"
+    itemLongDescription: "\u975E\u5E38\u7F8E\u5473\u7684\u5357\u74DC\uFF01"
     itemUseGridRadius: 2
     itemUseRadius: 0
     isStartingItem: 0
@@ -41,7 +41,7 @@ MonoBehaviour:
     itemType: 1
     itemDescription: Corn
     itemSprite: {fileID: 21300000, guid: 081b5033ea188cb48b5d44b99ab920bc, type: 3}
-    itemLongDescription: "\u975E\u5E38\u7F8E\u5473\uFF01"
+    itemLongDescription: "\u975E\u5E38\u7F8E\u5473\u7684\u7389\u7C73\uFF01"
     itemUseGridRadius: 2
     itemUseRadius: 0
     isStartingItem: 0
@@ -65,7 +65,7 @@ MonoBehaviour:
     itemType: 3
     itemDescription: A Basic Hoe
     itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
+    itemLongDescription: "\u666E\u901A\u7684\u9504\u5934"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -77,7 +77,7 @@ MonoBehaviour:
     itemType: 4
     itemDescription: A Basic Axe
     itemSprite: {fileID: 21300010, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "TTK\uFF01\u5149\u5934\u5F3A"
+    itemLongDescription: "\u666E\u901A\u7684\u65A7\u5934"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -101,7 +101,7 @@ MonoBehaviour:
     itemType: 1
     itemDescription: Parsnip
     itemSprite: {fileID: 21300000, guid: 0a1268bf801d5304ebf16458d7309ac1, type: 3}
-    itemLongDescription: "\u8FD9\u4E0D\u662F\u841D\u535C\uFF1F\uFF01"
+    itemLongDescription: "\u98CE\u6EDA\u8349"
     itemUseGridRadius: 2
     itemUseRadius: 0
     isStartingItem: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
     itemType: 0
     itemDescription: Canyon Oak Tree Stump
     itemSprite: {fileID: 7154603021615155856, guid: d241c496741a12d4290e12ba81dd6724, type: 3}
-    itemLongDescription: 
+    itemLongDescription: "\u6811\u6869"
     itemUseGridRadius: 0
     itemUseRadius: 0
     isStartingItem: 0
@@ -161,7 +161,7 @@ MonoBehaviour:
     itemType: 7
     itemDescription: Wicker Basket
     itemSprite: {fileID: 21300504, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: A wicker basket for harvesting produce you have grown
+    itemLongDescription: "\u6536\u83B7\uFF01"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -173,7 +173,7 @@ MonoBehaviour:
     itemType: 5
     itemDescription: A Basic Pickaxe
     itemSprite: {fileID: 21300094, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: A strong, sturdy basic pickaxe - great for breaking rocks
+    itemLongDescription: "\u6316\u77FF\u7528\u94C1\u9550"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -221,7 +221,7 @@ MonoBehaviour:
     itemType: 6
     itemDescription: A Basic Scythe For Reaping
     itemSprite: {fileID: 21300506, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: A sharp, basic scythe - great for cutting grass
+    itemLongDescription: "\u6E05\u9664\u6742\u8349\u540E\u624D\u80FD\u5BF9\u571F\u5730\u8015\u79CD"
     itemUseGridRadius: 0
     itemUseRadius: 1.5
     isStartingItem: 1
@@ -304,8 +304,8 @@ MonoBehaviour:
   - itemCode: 10024
     itemType: 9
     itemDescription: A Better Hoe
-    itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
+    itemSprite: {fileID: -347886676, guid: c12c725128e74be4ab3bc59f0ff71610, type: 3}
+    itemLongDescription: "\u94F6\u9504\u5934"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -316,8 +316,8 @@ MonoBehaviour:
   - itemCode: 10025
     itemType: 11
     itemDescription: A Best Hoe
-    itemSprite: {fileID: 21300052, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "\u5B83\u662F\u79CD\u690D\u7684\u5F00\u59CB"
+    itemSprite: {fileID: 1420574441, guid: c12c725128e74be4ab3bc59f0ff71610, type: 3}
+    itemLongDescription: "\u91D1\u9504\u5934"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -328,8 +328,8 @@ MonoBehaviour:
   - itemCode: 10026
     itemType: 10
     itemDescription: A Better Watering Can
-    itemSprite: {fileID: 21300136, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "\u6C34 \u662F\u4E07\u7269\u4E4B\u6E90\u3002"
+    itemSprite: {fileID: 1650630921, guid: c12c725128e74be4ab3bc59f0ff71610, type: 3}
+    itemLongDescription: "\u94F6\u6C34\u58F6"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1
@@ -340,8 +340,8 @@ MonoBehaviour:
   - itemCode: 10027
     itemType: 12
     itemDescription: A Best Watering Can
-    itemSprite: {fileID: 21300136, guid: 853ac38383c680342ac7e688bf29b197, type: 3}
-    itemLongDescription: "\u6C34 \u662F\u4E07\u7269\u4E4B\u6E90\u3002"
+    itemSprite: {fileID: 2088746702, guid: c12c725128e74be4ab3bc59f0ff71610, type: 3}
+    itemLongDescription: "\u91D1\u6C34\u58F6"
     itemUseGridRadius: 1
     itemUseRadius: 0
     isStartingItem: 1

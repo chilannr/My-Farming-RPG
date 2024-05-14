@@ -51,7 +51,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     private Rigidbody2D rigidBody2D;
     private WaitForSeconds useToolAnimationPause;
 
-    private Direction playerDirection;
+    public Direction playerDirection;
 
     private List<CharacterAttribute> characterAttributeCustomisationList;
     private float movementSpeed;
@@ -135,7 +135,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
 
             PlayerWalkInput();
 
-            PlayerClickInput();
+            //PlayerClickInput();
 
             PlayerTestInput();
 
@@ -250,12 +250,12 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             movementSpeed = Settings.runningSpeed;
         }
     }
-    private void PlayerClickInput()
+    public void PlayerClickInput()
     {
         if (!playerToolUseDisabled)
         {
-            if (Input.GetMouseButton(0))
-            {
+            //if (Input.GetMouseButton(0))
+            //{
                 if (gridCursor.CursorIsEnabled || cursor.CursorIsEnabled)
                 {
                     // 获取光标在网格上的位置
@@ -265,7 +265,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                     Vector3Int playerGridPosition = gridCursor.GetGridPositionForPlayer();
 
                     ProcessPlayerClickInput(cursorGridPosition, playerGridPosition);
-                }
+                //}
             }
         }
     }
@@ -279,8 +279,9 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     {
         ResetMovement();
 
-        Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
+        //Vector3Int playerDirection = GetPlayerClickDirection(cursorGridPosition, playerGridPosition);
 
+        Vector3Int playerDirectionVector3Int = GetPlayerDirection(playerDirection);
         // 获取光标位置的网格属性详情（GridCursor验证例程确保网格属性详情不为null）
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cursorGridPosition.x, cursorGridPosition.y);
         GridPropertyDetails[] gridPropertyDetailsPro = new GridPropertyDetails[9]; 
@@ -304,17 +305,17 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             switch (itemDetails.itemType)
             {
                 case ItemType.Seed:
-                    if (Input.GetMouseButtonDown(0))
-                    {
+                    //if (Input.GetMouseButtonDown(0))
+                    //{
                         ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
-                    }
+                   // }
                     break;
 
                 case ItemType.Commodity:
-                    if (Input.GetMouseButtonDown(0))
-                    {
+                    //if (Input.GetMouseButtonDown(0))
+                    //{
                         ProcessPlayerClickInputCommodity(itemDetails);
-                    }
+                   // }
                     break;
 
                 case ItemType.Watering_tool:
@@ -327,7 +328,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                 case ItemType.Collecting_tool:
                 case ItemType.Hoeing_tool_Pro:
                 case ItemType.Hoeing_tool_Ultra:
-                    ProcessPlayerClickInputTool(gridPropertyDetailsPro, itemDetails, playerDirection);
+                    ProcessPlayerClickInputTool(gridPropertyDetailsPro, itemDetails, playerDirectionVector3Int);
                     break;
 
                 case ItemType.none:
@@ -451,6 +452,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             case ItemType.Reaping_tool:
                 if (cursor.CursorPositionIsValid)
                 {
+                    Debug.Log("Reap in cursor direction");
                     playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCentrePosition());
                     ReapInPlayerDirectionAtCursor(itemDetails, playerDirection);
                 }
@@ -459,6 +461,12 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             default:
                 break;
         }
+        EventHandler.CallMovementEvent(xInput, yInput, isWalking, isRunning, isIdle, isCarrying, toolEffect,
+         isUsingToolRight, isUsingToolLeft, isUsingToolUp, isUsingToolDown,
+         isLiftingToolRight, isLiftingToolLeft, isLiftingToolUp, isLiftingToolDown,
+         isPickingRight, isPickingLeft, isPickingUp, isPickingDown,
+         isSwingingToolRight, isSwingingToolLeft, isSwingingToolUp, isSwingingToolDown,
+         false, false, false, false);
     }
     private void PlantSeedAtCursor(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
@@ -570,7 +578,6 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
         {
             isUsingToolDown = true;
         }
-
         yield return useToolAnimationPause;
         for (int i = 0; i < gridNumber; i++)
           {
@@ -586,7 +593,6 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                 // Display dug grid tiles
                 GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails[i]);
           }
-        
 
         // After animation pause
         yield return afterUseToolAnimationPause;
@@ -603,8 +609,8 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     /// <param name="playerDirection"></param>
     private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
-        if (Input.GetMouseButton(0)) // 如果按下鼠标左键
-        {
+        //if (Input.GetMouseButton(0)) // 如果按下鼠标左键
+        //{
             switch (equippedItemDetails.itemType)
             {
                 case ItemType.Reaping_tool: // 如果是收割工具
@@ -628,6 +634,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
             }
 
             // 定义用于碰撞测试的正方形中心点
+
             Vector2 point = new Vector2(GetPlayerCentrePosition().x + (playerDirection.x * (equippedItemDetails.itemUseRadius / 2f)), GetPlayerCentrePosition().y + playerDirection.y * (equippedItemDetails.itemUseRadius / 2f));
 
             // 定义用于碰撞测试的正方形大小
@@ -663,7 +670,7 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
                     }
                 }
             }
-        }
+       // }
     }
 
 
@@ -965,7 +972,28 @@ public class Player : SingletonMonobehaviour<Player>, ISaveable
     {
         return new Vector3(transform.position.x, transform.position.y + Settings.playerCentreYOffset, transform.position.z);
     }
-    private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
+    public Vector3Int GetPlayerDirection(Direction playerDirection)
+    {
+        Vector3Int vector3Int = Vector3Int.zero;
+        if (playerDirection.Equals(Direction.right))
+        {
+            vector3Int = Vector3Int.right;
+        }
+        else if (playerDirection.Equals(Direction.left))
+        {
+            vector3Int = Vector3Int.left;
+        }
+        else if (playerDirection.Equals(Direction.up))
+        {
+            vector3Int = Vector3Int.up;
+        }
+        else
+        {
+            vector3Int = Vector3Int.down;
+        }
+        return vector3Int;
+    }
+    public Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
     {
         if (
 

@@ -21,8 +21,8 @@ MonoBehaviour:
     season: 4
     toSceneName: 0
     toGridCoordinate:
-      x: 4
-      y: 2
+      x: -7
+      y: 3
     npcFacingDirectionAtDestination: 1
     animationAtDestination: {fileID: 0}
   - hour: 8

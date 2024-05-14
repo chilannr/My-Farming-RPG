@@ -11,7 +11,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private GridCursor gridCursor;
     private Cursor cursor;
     public GameObject draggedItem;
-
+    public Image selectedItemImage;
     public Image inventorySlotHighlight;
     public Image inventorySlotImage;
     public TextMeshProUGUI textMeshProUGUI;
@@ -153,8 +153,11 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             if (gridCursor.CursorPositionIsValid)
             {
                 // 获取鼠标位置的世界坐标
-                Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
-               
+                //Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -mainCamera.transform.position.z));
+
+                Vector3 worldPosition = gridCursor.GetGridPositionForPlayer();
+
+
                 // 在鼠标位置创建物品的预制体
                 GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2f, worldPosition.z), Quaternion.identity, parentItem);
                  Item item = itemGameObject.GetComponent<Item>();
@@ -177,6 +180,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     /// </summary>
     private void SetSelectedItem()
     {
+        selectedItemImage.color = Color.white;
+        selectedItemImage.sprite = inventorySlotImage.sprite;
         // 清除当前高亮的物品
         inventoryBar.ClearHighlightOnInventorySlots();
 
@@ -191,7 +196,7 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         cursor.ItemUseRadius = itemDetails.itemUseRadius;
 
         // If item requires a grid cursor then enable cursor
-        if (itemDetails.itemUseGridRadius > 0)
+        if (itemDetails.itemUseGridRadius > 0|| itemDetails.itemType!= ItemType.Reaping_tool)
         {
                 gridCursor.EnableCursor();
         }
@@ -228,7 +233,8 @@ public class UIInventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void ClearSelectedItem()
     {
         ClearCursors();
-
+        selectedItemImage.color = Color.clear;
+        selectedItemImage.sprite= null;
         // 清除当前高亮的物品
         inventoryBar.ClearHighlightOnInventorySlots();
 
