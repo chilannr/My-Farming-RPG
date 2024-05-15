@@ -205,6 +205,6 @@ public class Cursor : MonoBehaviour
 
         return new Vector2(gridCursor.GetWorldPositionForCursor().x, gridCursor.GetWorldPositionForCursor().y);
 
-        return RectTransformUtility.PixelAdjustPoint(screenPosition, cursorRectTransform, canvas);
+        //return RectTransformUtility.PixelAdjustPoint(screenPosition, cursorRectTransform, canvas);
     }
 }
