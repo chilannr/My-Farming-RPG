@@ -90,9 +90,15 @@ public class NPCPath : MonoBehaviour
 
                     Vector2Int fromGridPosition = new Vector2Int(fromGridX, fromGridY);
                     Vector2Int toGridPosition = new Vector2Int(toGridX, toGridY);
-
+                    //Debug.Log(gameObject.name);                    
+                    //Debug.Log(npcScheduleEvent.toSceneName + "Build Path from " + npcScheduleEvent.toGridCoordinate + " to " + npcScheduleEvent.ToString()); 
+                    //Debug.Log(scenePath.sceneName+"Build Path from " + fromGridPosition + " to " + toGridPosition);
                     // 构建路径并添加移动步骤到移动步骤栈
-                    NPCManager.Instance.BuildPath(scenePath.sceneName, fromGridPosition, toGridPosition, npcMovementStepStack);
+                    if (toGridPosition!=null)
+                    {
+                        NPCManager.Instance.BuildPath(scenePath.sceneName, fromGridPosition, toGridPosition, npcMovementStepStack);
+                    }
+               
                 }
             }
         }

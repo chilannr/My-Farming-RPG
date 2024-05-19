@@ -467,17 +467,17 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
     }
 
     /// <summary>
-    /// Set the grid property details to gridPropertyDetails for the tile at (gridX,gridY) for the gridpropertyDictionary.
+    /// 将网格属性详细信息设置为 gridPropertyDetails，用于 gridpropertyDictionary 中位于 (gridX, gridY) 处的瓦片。
     /// </summary>
     public void SetGridPropertyDetails(int gridX, int gridY, GridPropertyDetails gridPropertyDetails, Dictionary<string, GridPropertyDetails> gridPropertyDictionary)
     {
-        // Construct key from coordinate
+        // 从坐标构造键
         string key = "x" + gridX + "y" + gridY;
 
         gridPropertyDetails.gridX = gridX;
         gridPropertyDetails.gridY = gridY;
 
-        // Set value
+        // 设置数值
         gridPropertyDictionary[key] = gridPropertyDetails;
     }
 
@@ -553,7 +553,7 @@ public class GridPropertiesManager : SingletonMonobehaviour<GridPropertiesManage
             }
         }
 
-        // 显示网格属性详情以反映更改的值
+        // 显示网格属性详情（包括种植的作物生长变化）以反映更改的值
         DisplayGridPropertyDetails();
     }
 }

@@ -209,7 +209,7 @@ public class Crop : MonoBehaviour
 
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
-        // 显示种子物品
+        // 显示种子(如树木收获后的树桩)物品
         GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
     }
 

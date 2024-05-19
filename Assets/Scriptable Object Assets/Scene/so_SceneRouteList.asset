@@ -21,12 +21,12 @@ MonoBehaviour:
         x: 999999
         y: 999999
       toGridCell:
-        x: 39
-        y: 5
+        x: 40
+        y: 0
     - sceneName: 1
       fromGridCell:
-        x: -39
-        y: 5
+        x: -38
+        y: 0
       toGridCell:
         x: 999999
         y: 999999
@@ -38,12 +38,12 @@ MonoBehaviour:
         x: 999999
         y: 999999
       toGridCell:
-        x: -39
-        y: 5
+        x: -38
+        y: 0
     - sceneName: 0
       fromGridCell:
         x: 39
-        y: 5
+        y: 0
       toGridCell:
         x: 999999
         y: 999999
@@ -55,11 +55,11 @@ MonoBehaviour:
         x: 999999
         y: 999999
       toGridCell:
-        x: 2
+        x: -13
         y: 2
     - sceneName: 2
       fromGridCell:
-        x: 0
+        x: -2
         y: -4
       toGridCell:
         x: 999999
@@ -72,11 +72,11 @@ MonoBehaviour:
         x: 999999
         y: 999999
       toGridCell:
-        x: 0
+        x: -2
         y: -4
     - sceneName: 0
       fromGridCell:
-        x: 2
+        x: -13
         y: 2
       toGridCell:
         x: 999999
@@ -89,15 +89,15 @@ MonoBehaviour:
         x: 999999
         y: 999999
       toGridCell:
-        x: 0
+        x: -2
         y: -4
     - sceneName: 0
       fromGridCell:
-        x: 2
+        x: -13
         y: 2
       toGridCell:
-        x: 39
-        y: 5
+        x: 41
+        y: 0
     - sceneName: 1
       fromGridCell:
         x: -39
@@ -114,17 +114,17 @@ MonoBehaviour:
         y: 999999
       toGridCell:
         x: -39
-        y: 5
+        y: 0
     - sceneName: 0
       fromGridCell:
         x: 39
-        y: 5
+        y: 0
       toGridCell:
-        x: 2
+        x: -13
         y: 2
     - sceneName: 2
       fromGridCell:
-        x: 0
+        x: -2
         y: -4
       toGridCell:
         x: 999999
