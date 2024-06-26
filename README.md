@@ -4,7 +4,7 @@ https://www.bilibili.com/video/BV1qi4y1k7ix
 
 原作者：@Rob Ager
 原视频链接：https://www.udemy.com/course/unity-2d-game-developer-course-farming-rpg/
-这门中级课程将教你如何使用C#脚本创建复杂的Unity组件，为类似于Stardew Valley的农场RPG游戏构建核心系统。
+如何使用C#脚本创建复杂的Unity组件，为类似于Stardew Valley的农场RPG游戏构建核心系统。
 包括：
 在多层级层次结构中设置Player游戏对象，并使用事件实现移动和动画。
 使用多个Tilemap图层构建游戏场景，增加深度感。
