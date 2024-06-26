@@ -5,9 +5,7 @@ https://www.bilibili.com/video/BV1qi4y1k7ix
 原作者：@Rob Ager
 原视频链接：https://www.udemy.com/course/unity-2d-game-developer-course-farming-rpg/
 这门中级课程将教你如何使用C#脚本创建复杂的Unity组件，为类似于Stardew Valley的农场RPG游戏构建核心系统。
-课程时长为43个小时，通过深入的教程，包括每个讲座后的保存点，帮助你构建一个复杂的游戏，并提供完整的已完成项目。
-课程内容包括：
-
+包括：
 在多层级层次结构中设置Player游戏对象，并使用事件实现移动和动画。
 使用多个Tilemap图层构建游戏场景，增加深度感。
 使用Cinemachine创建相机，跟随玩家并保持在场景范围内。
@@ -28,7 +26,6 @@ https://www.bilibili.com/video/BV1qi4y1k7ix
 添加玩家声音、环境声音和游戏音乐。
 创建游戏的昼夜光照循环，使用可根据季节配置的光照计划。
 
-通过完成这门课程，你将学会构建一个复杂的农场RPG游戏，掌握Unity开发和C#脚本编程的技巧。
 ## Demo链接
 https://github.com/chilannr/My-Farming-RPG/releases/download/Ver1.0/My.Farming.RPG.Demo.zip
 
